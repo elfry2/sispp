@@ -1,0 +1,1 @@
+<a href="{{ route($resource . '.preferences', ['back' => request()->fullUrl()]) }}" class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }} ms-2" title="Edit {{ $resource }} listing preferences"><i class="bi-sliders"></i></a>
