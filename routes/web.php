@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TKelasController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,5 +72,16 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::get('users/preferences', [RegisteredUserController::class, 'preferences'])->name('users.preferences');
         Route::post('users/preferences', [RegisteredUserController::class, 'applyPreferences'])->name('users.applyPreferences');
         Route::resource('users', RegisteredUserController::class)->except('show');
+
+        Route::get('t_kelas/', [TKelasController::class, 'index'])->name('t_kelas.index');
+        Route::get('t_kelas/create', [TKelasController::class, 'create'])->name('t_kelas.create');
+        Route::post('t_kelas/store', [TKelasController::class, 'store'])->name('t_kelas.store');
+        Route::get('t_kelas/{t_kelas}/edit', [TKelasController::class, 'edit'])->name('t_kelas.edit');
+        Route::patch('t_kelas/{t_kelas}/update', [TKelasController::class, 'update'])->name('t_kelas.update');
+        Route::get('t_kelas/{t_kelas}/delete', [TKelasController::class, 'delete'])->name('t_kelas.delete');
+        Route::delete('t_kelas/{t_kelas}/destroy', [TKelasController::class, 'destroy'])->name('t_kelas.destroy');
+        Route::get('t_kelas/search', [TKelasController::class, 'search'])->name('t_kelas.search');
+        Route::get('t_kelas/preferences', [TKelasController::class, 'preferences'])->name('t_kelas.preferences');
+        Route::post('t_kelas/preferences', [TKelasController::class, 'applyPreferences'])->name('t_kelas.applyPreferences');
     });
 });

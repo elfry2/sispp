@@ -28,61 +28,16 @@
                         <div class="btn invisible"><i class="bi-moon"></i></div>
                     </div>
                     <div class="mt-3">
-                        <div class="d-flex align-items-center">
-                            <b>Folders</b>
-                            <a href="{{ route('folders.create') }}" class="ms-auto btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" title="Create new folder"><i
-                                    class="bi-plus-lg"></i></a>
-                        </div>
+                        <b>Aplikasi</b>
                         <div class="list-group">
-                            <form action="{{ route('preference.store') }}" method="post">
-                                @csrf
-                                <input type="hidden" name="redirectTo" value="{{ route('tasks.index') }}">
-                                <input type="hidden" name="key" value="currentFolderId">
-                                <button type="submit" name="value" value="" title="The default folder"
-                                    class="list-group-item list-group-item-action border-0 rounded @if (Route::is('tasks.*') && empty(preference('currentFolderId'))) bg-body-secondary @endif">General</button>
-                            </form>
-                            @foreach (Auth::user()->folders()->orderBy('name', 'ASC')->get() as $item)
-                                <form action="{{ route('preference.store') }}" method="post">
-                                    @csrf
-                                    <input type="hidden" name="redirectTo" value="{{ route('tasks.index') }}">
-                                    <input type="hidden" name="key" value="currentFolderId">
-                                    <button type="submit" name="value" value="{{ $item->id }}"
-                                        title="{{ $item->description ?? '' }}"
-                                        class="list-group-item list-group-item-action border-0 py-0 pe-0 rounded @if (Route::is('tasks.*') && preference('currentFolderId') == $item->id) bg-body-secondary @endif">
-                                        <div class="d-flex align-items-center">
-                                            <span class="flex-grow-1">{{ $item->name }}</span>
-                                            <div class="dropdown">
-                                                <a href="#" class="btn" data-bs-toggle="dropdown">
-                                                    <i class="bi-three-dots-vertical"></i>
-                                                </a>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item"
-                                                            href="{{ route('folders.edit', ['folder' => $item, 'back' => request()->fullUrl()]) }}"><i
-                                                                class="bi-pencil-square"></i><span
-                                                                class="ms-2">Edit</span></a></li>
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-                                                    <li><a class="dropdown-item"
-                                                            href="{{ route('folders.delete', ['folder' => $item, 'back' => request()->fullUrl()]) }}"><i
-                                                                class="bi-trash"></i><span
-                                                                class="ms-2">Delete</span></a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </button>
-                                </form>
-                            @endforeach
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <b>Application</b>
-                        <div class="list-group">
-                            @if (Auth::user()->level->id == 1)
+                            @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('users.index') }}"
                                     class="list-group-item list-group-item-action border-0 @if (Route::is('users.*')) bg-body-secondary rounded @endif"><i
-                                        class="bi-people"></i><span class="ms-2">Users</span></a>
+                                    class="bi-people"></i><span class="ms-2">Pengguna</span></a>
+                                <a href="{{ route('t_kelas.index') }}"
+                                    class="list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) bg-body-secondary rounded @endif"><i
+                                        class="bi-people"></i><span class="ms-2">Kelas</span></a>
                             @endif
                             <form action="{{ route('preference.store') }}" method="post">
                                 @csrf
@@ -101,13 +56,13 @@
                         <div class="list-group">
                             <a href="{{ route('profile.edit') }}"
                                 class="list-group-item list-group-item-action border-0 rounded"><i
-                                    class="bi-person"></i><span class="ms-2">Profile</span>
+                                    class="bi-person"></i><span class="ms-2">Profil</span>
                             </a>
                             <form action="{{ route('logout') }}" method="post">
                                 @csrf
                                 <button type="submit"
                                     class="list-group-item list-group-item-action border-0 rounded"><i
-                                        class="bi-box-arrow-left"></i><span class="ms-2">Log out</span></button>
+                                        class="bi-box-arrow-left"></i><span class="ms-2">Keluar</span></button>
                             </form>
                         </div>
                     </div>
