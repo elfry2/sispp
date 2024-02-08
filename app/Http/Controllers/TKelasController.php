@@ -15,7 +15,9 @@ class TKelasController extends Controller
     protected const resource = 't_kelas';
     protected const title = 'Kelas';
     protected const primaryKeyColumnName = 'kd_kls';
-    protected const queryColumnName = 'nm_kelas';
+    protected const queryColumnNames = [
+        'nm_kelas',
+    ];
 
     /**
      * Display a listing of the resource.
@@ -36,12 +38,20 @@ class TKelasController extends Controller
 
 
         if (!empty(request('q'))) {
-            $data->primary
-                = $data->primary->where(self::queryColumnName, 'like', '%' . request('q') . '%');
+
+            foreach (self::queryColumnNames as $index => $columnName) {
+
+                $method = 'where';
+
+                if($index > 0) $method = 'orWhere';
+
+                $data->primary = $data->primary
+                    ->$method($columnName, 'like', '%' . request('q') . '%');
+            }
         }
 
         $data->primary = $data->primary
-                              ->paginate(config('app.rowsPerPage'))->withQueryString();
+            ->paginate(config('app.rowsPerPage'))->withQueryString();
 
         return view(self::resource . '.index', (array) $data);
     }

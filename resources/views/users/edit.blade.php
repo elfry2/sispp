@@ -84,7 +84,7 @@
         <div class="d-flex justify-content-end mt-3">
             <a href="{{ route(str($resource) . '.delete', [Str::singular($resource) => $primary]) }}"
                 class="btn border-0 btn-outline-danger" title="Delete {{ str($resource)->singular() }}"><i class="bi-trash"></i></a>
-            <button class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" type="submit"><i class="bi-pencil-square"></i><span class="ms-2">Save</span></button>
+            <button class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" type="submit"><i class="bi-pencil-square"></i><span class="ms-2">Simpan</span></button>
         </div>
     </form>
 @endsection

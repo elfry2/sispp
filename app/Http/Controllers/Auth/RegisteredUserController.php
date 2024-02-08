@@ -22,6 +22,14 @@ class RegisteredUserController extends Controller
 {
     protected const resource = 'users';
 
+    protected const title = "Pengguna";
+
+    protected const queryColumnNames = [
+        'name',
+        'username',
+        'email',
+    ];
+
     /**
      * Display a listing of the resource.
      */
@@ -31,7 +39,7 @@ class RegisteredUserController extends Controller
 
         $data = (object) [
             'resource' => self::resource,
-            'title' => str(self::resource)->title(),
+            'title' => self::title,
             'primary'
             => (new $primary)->orderBy(
                 preference(self::resource . '.order.column', 'id'),
@@ -39,12 +47,24 @@ class RegisteredUserController extends Controller
             ),
         ];
 
+
+        // protected const queryColumnNames = [
+        //     'name',
+        //     'username',
+        //     'email',
+        // ];
+
         if (!empty(request('q'))) {
-            $data->primary
-            = $data->primary->where('name', 'like', '%' . request('q') . '%')
-            // ->orWhere('username', 'like', '%' . request('q') . '%')
-            // ->orWhere('email', 'like', '%' . request('q') . '%')
-            ;
+
+            foreach (self::queryColumnNames as $index => $columnName) {
+
+                $method = 'where';
+
+                if($index > 0) $method = 'orWhere';
+
+                $data->primary = $data->primary
+                    ->$method($columnName, 'like', '%' . request('q') . '%');
+            }
         }
 
         if (!empty(preference(self::resource . '.filters.levelId'))) {
@@ -122,7 +142,7 @@ class RegisteredUserController extends Controller
             return redirect(route(self::resource . '.index'))
                 ->with('message', (object) [
                     'type' => 'success',
-                    'content' => str(self::resource)->singular()->title() . ' created.'
+                    'content' => self::title . ' ditambahkan.'
                 ]);
 
         Auth::login($primary);
@@ -147,7 +167,7 @@ class RegisteredUserController extends Controller
 
         $data = (object) [
             'resource' => self::resource,
-            'title' => 'Edit ' . str(self::resource)->title()->singular()->lower(),
+            'title' => 'Sunting ' . str(self::title)->lower(),
             'primary' => $primary,
             'secondary' => Level::all(),
         ];
@@ -240,7 +260,7 @@ class RegisteredUserController extends Controller
         return redirect()->back()
             ->with('message', (object) [
                 'type' => 'success',
-                'content' => str(self::resource)->singular()->title() . ' updated.'
+                'content' => self::title . ' disunting.'
             ]);
     }
 
@@ -253,7 +273,7 @@ class RegisteredUserController extends Controller
 
         $data = (object) [
             'resource' => self::resource,
-            'title' => 'Delete ' . str(self::resource)->title()->singular()->lower(),
+            'title' => 'Hapus ' . str(self::title)->lower(),
             'primary' => $primary
         ];
 
@@ -270,8 +290,8 @@ class RegisteredUserController extends Controller
         if ($primary->id == Auth::id())
             return redirect(route(self::resource . '.index'))
                 ->with('message', (object) [
-                    'type' => 'warning',
-                    'content' => 'Cannot delete as the same user.',
+                    'type' => 'danger',
+                    'content' => 'Tidak bisa menghapus pengguna yang sama',
                 ]);
 
         Storage::delete($primary->avatar ?: '');
@@ -283,7 +303,7 @@ class RegisteredUserController extends Controller
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
                 'type' => 'success',
-                'content' => str(self::resource)->singular()->title() . ' deleted.'
+                'content' => self::title . ' dihapus.'
             ]);
     }
 
