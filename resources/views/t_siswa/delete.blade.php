@@ -1,8 +1,8 @@
 @extends('layouts.form')
 @section('content')
-    <h5 class="mt-5">{{ $title }} {{ $primary->nm_kelas }}?</h5>
+    <h5 class="mt-5">{{ $title }} {{ $primary->nis }}?</h5>
     <p>Tindakan ini tidak dapat dibatalkan.</p>
-    <form action="{{ route(str($resource) . '.destroy', ['id' => $primary->kd_kls]) }}" method="post" class="mt-5">
+    <form action="{{ route(str($resource) . '.destroy', ['id' => $primary->nis]) }}" method="post" class="mt-5">
         @method('delete')
         @csrf
         <div class="d-flex justify-content-end mt-3">

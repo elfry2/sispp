@@ -13,10 +13,18 @@ use App\Models\t_kelas;
 class TKelasController extends Controller
 {
     protected const resource = 't_kelas';
+
     protected const title = 'Kelas';
+
     protected const primaryKeyColumnName = 'kd_kls';
+
     protected const queryColumnNames = [
         'nm_kelas',
+    ];
+
+    protected const validationRules = [
+        'nm_kelas' => 'required|string|max:255',
+        'jumlah_siswa' => 'required|numeric|max:40',
     ];
 
     /**
@@ -74,15 +82,9 @@ class TKelasController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = (object) $request->validate([
-            'nm_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|numeric|max:40',
-        ]);
+        $validated = $request->validate(self::validationRules);
 
-        $t_kelas = t_kelas::create([
-            'nm_kelas' => $validated->nm_kelas,
-            'jumlah_siswa' => $validated->jumlah_siswa,
-        ]);
+        $t_kelas = t_kelas::create($validated);
 
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
@@ -129,15 +131,9 @@ class TKelasController extends Controller
         $primary = (new $primary)
             ->where(self::primaryKeyColumnName, $id);
 
-        $validated = (object) $request->validate([
-            'nm_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|numeric|max:40',
-        ]);
+        $validated = $request->validate(self::validationRules);
 
-        $primary = $primary->update([
-            'nm_kelas' => $validated->nm_kelas,
-            'jumlah_siswa' => $validated->jumlah_siswa,
-        ]);
+        $primary = $primary->update($validated);
 
         return redirect()->back()->with('message', (object) [
             'type' => 'success',
@@ -216,11 +212,9 @@ class TKelasController extends Controller
         ]);
 
         foreach ([
-            [self::resource . '.order.column' => $validated->order_column],
-            [self::resource . '.order.direction' => $validated->order_direction],
-        ] as $preference) {
-        preference($preference);
-        }
+            'order.column' => $validated->order_column,
+            'order.direction' => $validated->order_direction,
+        ] as $key => $value) preference([self::resource . '.' . $key => $value]);
 
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [

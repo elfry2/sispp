@@ -345,7 +345,7 @@ class RegisteredUserController extends Controller
     {
         $data = (object) [
             'resource' => self::resource,
-            'title' => str(self::resource)->title() . ' preferences',
+            'title' => 'Preferensi ' . str(self::title)->lower(),
             'primary' => Schema::getColumnListing(self::resource),
         ];
 
@@ -373,17 +373,15 @@ class RegisteredUserController extends Controller
         ]);
 
         foreach ([
-            [self::resource . '.order.column' => $validated->order_column],
-            [self::resource . '.order.direction' => $validated->order_direction],
-            [self::resource . '.filters.levelId' => $validated->level_id],
-        ] as $preference) {
-            preference($preference);
-        }
+            'order.column' => $validated->order_column,
+            'order.direction' => $validated->order_direction,
+            'filters.levelId' => $validated->level_id,
+        ] as $key => $value) preference([self::resource . '.' . $key => $value]);
 
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
                 'type' => 'success',
-                'content' => 'Preferences updated.'
+                'content' => 'Preferensi diperbarui.'
             ]);
     }
 

@@ -15,7 +15,7 @@
 <body>
     <div class="py-3 sticky-top bg-{{ preference('theme') == 'dark' ? 'dark' : 'white' }}">
         <div class="d-flex align-items-center mx-auto" style="max-width: 32em">
-            <a href="{{ request('back') ?? url()->previous() }}" class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" title="Go back"><i
+            <a href="{{ route($resource . '.index') ?? url()->previous() }}" class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" title="Go back"><i
                     class="bi-chevron-left"></i></a>
             <h5 class="m-0 ms-2">{{ $title ?? '' }}</h5>
         </div>

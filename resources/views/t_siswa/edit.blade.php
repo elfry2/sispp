@@ -58,12 +58,12 @@
     <div class="input-group mt-3">
        <span class="input-group-text">Rp.</span>
        <div class="form-floating">
-           <input name="spp_perbulan" type="number" min="0" step="500" id="monthlyFeeNumberInput" class="form-control" placeholder="" value="{{ old('spp_perbulan') >> $primary->spp_perbulan }}">
+           <input name="spp_perbulan" type="number" min="0" step="500" id="monthlyFeeNumberInput" class="form-control" placeholder="" value="{{ old('spp_perbulan') ?? (int) $primary->spp_perbulan }}">
            <label for="monthlyFeeNumberInput">SPP per bulan</label>
        </div>
     </div>
     <div class="d-flex justify-content-end mt-3">
-        <a href="{{ route($resource . '.delete', ['id' => $primary->kd_kls]) }}"
+        <a href="{{ route($resource . '.delete', ['id' => $primary->nis]) }}"
            class="btn border-0 btn-outline-danger" title="Delete {{ str($resource)->singular() }}"><i class="bi-trash"></i></a>
         <button class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" type="submit"><i class="bi-pencil-square"></i><span class="ms-2">Save</span></button>
     </div>

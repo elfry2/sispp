@@ -14,11 +14,27 @@ use App\Models\t_kelas;
 class TSiswaController extends Controller
 {
     protected const resource = 't_siswa';
+
     protected const title = 'Siswa';
+
     protected const primaryKeyColumnName = 'nis';
+
     protected const queryColumnNames = [
         'nis',
         'nama_siswa',
+    ];
+
+    protected const validationRules = [
+        'nis' => 'required|numeric|digits_between:0,20',
+        'nama_siswa' => 'required|string|max:30',
+        'alamat' => 'required|string|max:255',
+        'tgl_lahir' => 'required|date',
+        'tempat_lahir' => 'required|string|max:30',
+        'jk' => 'required|boolean',
+        'nama_orang_tua' => 'required|string|max:30',
+        'no_hp' => 'required|numeric|digits_between:0,15',
+        'kd_kls' => 'required|numeric|exists:t_kelas,kd_kls',
+        'spp_perbulan' => 'required|decimal:0,2|min:0',
     ];
 
     /**
@@ -38,6 +54,10 @@ class TSiswaController extends Controller
             ),
         ];
 
+        $classFilterPreference = preference(self::resource . '.filters.classId');
+
+        if($classFilterPreference)
+            $data->primary->where('kd_kls', $classFilterPreference);
 
         if (!empty(request('q'))) {
 
@@ -91,18 +111,7 @@ class TSiswaController extends Controller
         // $table->foreign('kd_kls')->references('kd_kls')->on('t_kelas');
         // $table->decimal('spp_perbulan');
 
-        $validated = $request->validate([
-            'nis' => 'required|numeric|digits_between:0,20',
-            'nama_siswa' => 'required|string|max:30',
-            'alamat' => 'required|string|max:255',
-            'tgl_lahir' => 'required|date',
-            'tempat_lahir' => 'required|string|max:30',
-            'jk' => 'required|boolean',
-            'nama_orang_tua' => 'required|string|max:30',
-            'no_hp' => 'required|numeric|digits_between:0,15',
-            'kd_kls' => 'required|numeric|exists:t_kelas,kd_kls',
-            'spp_perbulan' => 'required|integer|min:0',
-        ]);
+        $validated = $request->validate(self::validationRules);
 
         $t_siswa = t_siswa::create($validated);
 
@@ -152,22 +161,15 @@ class TSiswaController extends Controller
         $primary = (new $primary)
             ->where(self::primaryKeyColumnName, $id);
 
-        $validated = $request->validate([
-            'nis' => 'required|numeric|digits_between:0,20',
-            'nama_siswa' => 'required|string|max:30',
-            'alamat' => 'required|string|max:255',
-            'tgl_lahir' => 'required|date',
-            'tempat_lahir' => 'required|string|max:30',
-            'jk' => 'required|boolean',
-            'nama_orang_tua' => 'required|string|max:30',
-            'no_hp' => 'required|numeric|digits_between:0,15',
-            'kd_kls' => 'required|numeric|exists:t_kelas,kd_kls',
-            'spp_perbulan' => 'required|integer|min:0',
-        ]);
+        $validated = $request->validate(self::validationRules);
 
-        $primary = $primary->update($validated);
+        $primary->update($validated);
 
-        return redirect()->back()->with('message', (object) [
+        $validated = (object) $validated;
+
+        return redirect()->route(self::resource . '.edit', [
+            'id' => $validated->nis,
+        ])->with('message', (object) [
             'type' => 'success',
             'content' => self::title . ' disunting.'
         ]);
@@ -186,7 +188,7 @@ class TSiswaController extends Controller
 
         $data = (object) [
             'resource' => self::resource,
-            'title' => 'Hapus ' . self::title,
+            'title' => 'Hapus ' . str(self::title)->lower(),
             'primary' => $primary
         ];
 
@@ -221,6 +223,7 @@ class TSiswaController extends Controller
             'resource' => self::resource,
             'title' => 'Preferensi ' . str(self::title)->lower(),
             'primary' => Schema::getColumnListing(self::resource),
+            'secondary' => t_kelas::all(),
         ];
 
         $data->primary = collect($data->primary)->map(function ($element) {
@@ -241,14 +244,14 @@ class TSiswaController extends Controller
         $validated = (object) $request->validate([
             'order_column' => 'required|max:255',
             'order_direction' => 'required|max:255',
+            'kd_kls' => 'nullable|numeric|digits_between:0,3',
         ]);
 
         foreach ([
-            [self::resource . '.order.column' => $validated->order_column],
-            [self::resource . '.order.direction' => $validated->order_direction],
-        ] as $preference) {
-        preference($preference);
-        }
+            'order.column' => $validated->order_column,
+            'order.direction' => $validated->order_direction,
+            'filters.classId' => $validated->kd_kls,
+        ] as $key => $value) preference([self::resource . '.' . $key => $value]);
 
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
