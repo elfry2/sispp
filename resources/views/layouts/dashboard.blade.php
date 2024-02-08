@@ -32,12 +32,12 @@
                         <div class="list-group">
                             @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
-                                <a href="{{ route('users.index') }}"
+                                <a href="{{ route('t_siswa.index') }}"
                                     class="list-group-item list-group-item-action border-0 @if (Route::is('t_siswa.*')) bg-body-secondary rounded @endif"><i
-                                    class="bi-people"></i><span class="ms-2">Siswa</span></a>
+                                    class="bi-backpack"></i><span class="ms-2">Siswa</span></a>
                                 <a href="{{ route('t_kelas.index') }}"
                                     class="list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) bg-body-secondary rounded @endif"><i
-                                        class="bi-people"></i><span class="ms-2">Kelas</span></a>
+                                        class="bi-building"></i><span class="ms-2">Kelas</span></a>
                                 <a href="{{ route('users.index') }}"
                                     class="list-group-item list-group-item-action border-0 @if (Route::is('users.*')) bg-body-secondary rounded @endif"><i
                                     class="bi-people"></i><span class="ms-2">Pengguna</span></a>

@@ -13,14 +13,14 @@
 </head>
 
 <body>
-    <div class="pt-3 sticky-top bg-{{ preference('theme') == 'dark' ? 'dark' : 'white' }}">
+    <div class="py-3 sticky-top bg-{{ preference('theme') == 'dark' ? 'dark' : 'white' }}">
         <div class="d-flex align-items-center mx-auto" style="max-width: 32em">
             <a href="{{ request('back') ?? url()->previous() }}" class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" title="Go back"><i
                     class="bi-chevron-left"></i></a>
             <h5 class="m-0 ms-2">{{ $title ?? '' }}</h5>
         </div>
     </div>
-    <div class="container-fluid mx-auto mt-3" style="max-width: 32em">
+    <div class="container-fluid mx-auto" style="max-width: 32em">
         <div class="mt-3">
             @include('components.messages')
             @yield('content')

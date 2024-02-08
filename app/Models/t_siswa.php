@@ -10,6 +10,8 @@ class t_siswa extends Model
 {
     use HasFactory;
 
+    protected $table = 't_siswa';
+
     protected $fillable = [
         'nis',
         'nama_siswa',
@@ -24,6 +26,6 @@ class t_siswa extends Model
     ];
 
     public function kelas() {
-        return $this->belongsTo(t_kelas::class);
+        return $this->belongsTo(t_kelas::class, 'kd_kls', 'kd_kls');
     }
 }

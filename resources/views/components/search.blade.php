@@ -1,4 +1,4 @@
-@if ($primary->count() > 0)
+@if ($primary->count() > 0 || !empty(request('q')))
 <form class="d-flex hide-on-small-screens" role="search">
     <div class="input-group flex-nowrap {{-- hide-on-small-screens --}}">
         <input name="q" id="searchSearchInput" class="form-control border-dark-subtle border-end-0" style="min-width: 8em" type="search" placeholder="Cari {{ Str::lower($title) }}..." aria-label="Search" autofocus>

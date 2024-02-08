@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\Folder;
 use App\Models\t_siswa;
+use App\Models\t_kelas;
 
 class TSiswaController extends Controller
 {
@@ -47,11 +48,12 @@ class TSiswaController extends Controller
                 if($index > 0) $method = 'orWhere';
 
                 $data->primary = $data->primary
-                    ->$method($columnName, 'like', '%' . request('q') . '%');
+                                      ->$method($columnName, 'like', '%' . request('q') . '%');
             }
+        }
 
         $data->primary = $data->primary
-            ->paginate(config('app.rowsPerPage'))->withQueryString();
+                              ->paginate(config('app.rowsPerPage'))->withQueryString();
 
         return view(self::resource . '.index', (array) $data);
     }
@@ -64,6 +66,7 @@ class TSiswaController extends Controller
         $data = (object) [
             'resource' => self::resource,
             'title' => 'Tambah ' . str(self::title)->lower(),
+            'primary' => t_kelas::all(),
         ];
 
         return view(self::resource . '.create', (array) $data);
@@ -74,15 +77,34 @@ class TSiswaController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = (object) $request->validate([
-            'nm_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|numeric|max:40',
+
+        // $table->string('nis')->unique();
+        // $table->primary('nis');
+        // $table->string('nama_siswa', 30);
+        // $table->string('alamat', 40);
+        // $table->date('tgl_lahir');
+        // $table->string('tempat_lahir', 30);
+        // $table->string('jk', 15);
+        // $table->string('nama_orang_tua', 15);
+        // $table->string('no_hp');
+        // $table->unsignedBigInteger('kd_kls');
+        // $table->foreign('kd_kls')->references('kd_kls')->on('t_kelas');
+        // $table->decimal('spp_perbulan');
+
+        $validated = $request->validate([
+            'nis' => 'required|numeric|digits_between:0,20',
+            'nama_siswa' => 'required|string|max:30',
+            'alamat' => 'required|string|max:255',
+            'tgl_lahir' => 'required|date',
+            'tempat_lahir' => 'required|string|max:30',
+            'jk' => 'required|boolean',
+            'nama_orang_tua' => 'required|string|max:30',
+            'no_hp' => 'required|numeric|digits_between:0,15',
+            'kd_kls' => 'required|numeric|exists:t_kelas,kd_kls',
+            'spp_perbulan' => 'required|integer|min:0',
         ]);
 
-        $t_siswa = t_siswa::create([
-            'nm_kelas' => $validated->nm_kelas,
-            'jumlah_siswa' => $validated->jumlah_siswa,
-        ]);
+        $t_siswa = t_siswa::create($validated);
 
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
@@ -114,6 +136,7 @@ class TSiswaController extends Controller
             'resource' => self::resource,
             'title' => 'Sunting ' . str(self::title)->lower(),
             'primary' => $primary,
+            'secondary' => t_kelas::all(),
         ];
 
         return view(self::resource . '.edit', (array) $data);
@@ -129,15 +152,20 @@ class TSiswaController extends Controller
         $primary = (new $primary)
             ->where(self::primaryKeyColumnName, $id);
 
-        $validated = (object) $request->validate([
-            'nm_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|numeric|max:40',
+        $validated = $request->validate([
+            'nis' => 'required|numeric|digits_between:0,20',
+            'nama_siswa' => 'required|string|max:30',
+            'alamat' => 'required|string|max:255',
+            'tgl_lahir' => 'required|date',
+            'tempat_lahir' => 'required|string|max:30',
+            'jk' => 'required|boolean',
+            'nama_orang_tua' => 'required|string|max:30',
+            'no_hp' => 'required|numeric|digits_between:0,15',
+            'kd_kls' => 'required|numeric|exists:t_kelas,kd_kls',
+            'spp_perbulan' => 'required|integer|min:0',
         ]);
 
-        $primary = $primary->update([
-            'nm_kelas' => $validated->nm_kelas,
-            'jumlah_siswa' => $validated->jumlah_siswa,
-        ]);
+        $primary = $primary->update($validated);
 
         return redirect()->back()->with('message', (object) [
             'type' => 'success',

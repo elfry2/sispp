@@ -1,3 +1,1 @@
-<h5 class="text-center text-secondary screen-center">No @if (!empty(request('q')))
-    such
-@endif {{ str($resource)->singular() }}</h5>
+<h5 class="text-center text-secondary screen-center">Tidak ada {{ str($title)->lower() . (!empty(request('q')) ? ' seperti "' . request('q') . '"' : '') }}</h5>

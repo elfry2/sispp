@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\FolderController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TKelasController;
+use App\Http\Controllers\TSiswaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -82,6 +83,17 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::delete('t_kelas/{id}/destroy', [TKelasController::class, 'destroy'])->name('t_kelas.destroy');
         Route::get('t_kelas/search', [TKelasController::class, 'search'])->name('t_kelas.search');
         Route::get('t_kelas/preferences', [TKelasController::class, 'preferences'])->name('t_kelas.preferences');
-        Route::post('t_kelas/preferences', [TKelasController::class, 'applyPreferences'])->name('t_kelas.applyPreferences');
+
+        Route::get('t_siswa/', [TSiswaController::class, 'index'])->name('t_siswa.index');
+        Route::get('t_siswa/create', [TSiswaController::class, 'create'])->name('t_siswa.create');
+        Route::post('t_siswa/store', [TSiswaController::class, 'store'])->name('t_siswa.store');
+        Route::get('t_siswa/{id}/edit', [TSiswaController::class, 'edit'])->name('t_siswa.edit');
+        Route::patch('t_siswa/{id}/update', [TSiswaController::class, 'update'])->name('t_siswa.update');
+        Route::get('t_siswa/{id}/delete', [TSiswaController::class, 'delete'])->name('t_siswa.delete');
+        Route::delete('t_siswa/{id}/destroy', [TSiswaController::class, 'destroy'])->name('t_siswa.destroy');
+        Route::get('t_siswa/search', [TSiswaController::class, 'search'])->name('t_siswa.search');
+        Route::get('t_siswa/preferences', [TSiswaController::class, 'preferences'])->name('t_siswa.preferences');
+        Route::post('t_siswa/preferences', [TSiswaController::class, 'applyPreferences'])->name('t_siswa.applyPreferences');
+        Route::post('t_siswa/preferences', [TSiswaController::class, 'applyPreferences'])->name('t_siswa.applyPreferences');
     });
 });
