@@ -1,9 +1,8 @@
-# todo
-A to-do list app written in Laravel 10, which I use as a template for my other Laravel projects.
+# SISPP
+Sistem Informasi Sumbangan Pembinaan Pendidikan. Written in Laravel 10.
 
-![A screenshot of task list](https://github.com/elfry2/todo/assets/47256917/271355bd-d927-471e-bfa4-a1b33d9b8e50 "A screenshot of task list")
-
-
+## About the questionable architecture and UX decisions
+I have to comply with whatever the analyst came up with. 
 
 ## Installation
 1. Create a database
