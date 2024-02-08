@@ -14,6 +14,7 @@ class TKelasController extends Controller
 {
     protected const resource = 't_kelas';
     protected const title = 'Kelas';
+    protected const primaryKeyColumnName = 'kd_kls';
     protected const queryColumnName = 'nm_kelas';
 
     /**
@@ -73,16 +74,17 @@ class TKelasController extends Controller
             'jumlah_siswa' => $validated->jumlah_siswa,
         ]);
 
-        return redirect(route(self::resource . '.index'))->with('message', (object) [
-            'type' => 'success',
-            'content' => self::title . ' ditambahkan.'
-        ]);
+        return redirect(route(self::resource . '.index'))
+            ->with('message', (object) [
+                'type' => 'success',
+                'content' => self::title . ' ditambahkan.'
+            ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(t_kelas $t_kelas)
+    public function show($id)
     {
         return redirect(route(self::resource . '.edit'));
     }
@@ -90,12 +92,12 @@ class TKelasController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($t_kelas)
+    public function edit($id)
     {
         $primary = '\App\Models\\' . self::resource;
 
         $primary = (new $primary)
-            ->where('kd_kls', $t_kelas)
+            ->where(self::primaryKeyColumnName, $id)
             ->first();
 
         $data = (object) [
@@ -110,12 +112,12 @@ class TKelasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $t_kelas)
+    public function update(Request $request, $id)
     {
         $primary = '\App\Models\\' . self::resource;
 
         $primary = (new $primary)
-            ->where('kd_kls', $t_kelas);
+            ->where(self::primaryKeyColumnName, $id);
 
         $validated = (object) $request->validate([
             'nm_kelas' => 'required|string|max:255',
@@ -136,12 +138,12 @@ class TKelasController extends Controller
     /**
      * Show the form for deleting the specified resource.
      */
-    public function delete($t_kelas)
+    public function delete($id)
     {
         $primary = '\App\Models\\' . self::resource;
 
         $primary = (new $primary)
-            ->where('kd_kls', $t_kelas)
+            ->where(self::primaryKeyColumnName, $id)
             ->first();
 
         $data = (object) [
@@ -156,12 +158,12 @@ class TKelasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($t_kelas)
+    public function destroy($id)
     {
         $primary = '\App\Models\\' . self::resource;
 
         $primary = (new $primary)
-            ->where('kd_kls', $t_kelas);
+            ->where(self::primaryKeyColumnName, $id);
 
         $primary->delete();
 
@@ -179,7 +181,7 @@ class TKelasController extends Controller
     {
         $data = (object) [
             'resource' => self::resource,
-            'title' => str(self::resource)->title() . ' preferences',
+            'title' => 'Preferensi ' . str(self::title)->lower(),
             'primary' => Schema::getColumnListing(self::resource),
         ];
 
@@ -213,7 +215,7 @@ class TKelasController extends Controller
         return redirect(route(self::resource . '.index'))
             ->with('message', (object) [
                 'type' => 'success',
-                'content' => 'Preferences updated.'
+                'content' => 'Preferensi disunting.'
             ]);
     }
 

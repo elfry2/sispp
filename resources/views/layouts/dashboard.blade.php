@@ -33,11 +33,14 @@
                             @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('users.index') }}"
-                                    class="list-group-item list-group-item-action border-0 @if (Route::is('users.*')) bg-body-secondary rounded @endif"><i
-                                    class="bi-people"></i><span class="ms-2">Pengguna</span></a>
+                                    class="list-group-item list-group-item-action border-0 @if (Route::is('t_siswa.*')) bg-body-secondary rounded @endif"><i
+                                    class="bi-people"></i><span class="ms-2">Siswa</span></a>
                                 <a href="{{ route('t_kelas.index') }}"
                                     class="list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) bg-body-secondary rounded @endif"><i
                                         class="bi-people"></i><span class="ms-2">Kelas</span></a>
+                                <a href="{{ route('users.index') }}"
+                                    class="list-group-item list-group-item-action border-0 @if (Route::is('users.*')) bg-body-secondary rounded @endif"><i
+                                    class="bi-people"></i><span class="ms-2">Pengguna</span></a>
                             @endif
                             <form action="{{ route('preference.store') }}" method="post">
                                 @csrf
@@ -47,7 +50,7 @@
                                     value="{{ preference('theme', 'light') == 'light' ? 'dark' : 'light' }}"
                                     class="list-group-item list-group-item-action border-0 rounded"><i
                                         class="bi-{{ preference('theme', 'light') == 'light' ? 'moon' : 'sun' }}"></i><span
-                                        class="ms-2">{{ preference('theme', 'light') == 'light' ? 'Dark theme' : 'Light theme' }}</span></button>
+                                        class="ms-2">{{ preference('theme', 'light') == 'light' ? 'Tema gelap' : 'Tema terang' }}</span></button>
                             </form>
                         </div>
                     </div>

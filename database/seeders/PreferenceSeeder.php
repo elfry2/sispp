@@ -17,7 +17,7 @@ class PreferenceSeeder extends Seeder
             [
                 'user_id' => 1,
                 'key' => 'theme',
-                'value' => 'dark'
+                'value' => 'light'
             ],
         ];
 

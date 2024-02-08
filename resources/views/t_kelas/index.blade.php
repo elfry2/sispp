@@ -17,7 +17,7 @@
                     <th>Jumlah siswa maksimal</th>
                 </tr>
                 @foreach ($primary as $row)
-                <tr id="row{{ $loop->index + 1 }}" style="cursor: pointer" onclick="window.location.href = '{{ route("$resource.edit", ['t_kelas' => $row->kd_kls]) . '?back=' . route($resource . '.index') }}'">
+                <tr id="row{{ $loop->index + 1 }}" style="cursor: pointer" onclick="window.location.href = '{{ route("$resource.edit", ['id' => $row->kd_kls]) . '?back=' . route($resource . '.index') }}'">
                         <td>{{ $primary->perPage() * ($primary->currentPage() - 1) + $loop->index + 1 }}</td>
                         <td>{{ $row->nm_kelas }}</td>
                         <td>{{ $row->siswa->count() }}</td>

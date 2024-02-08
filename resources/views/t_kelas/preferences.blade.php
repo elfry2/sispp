@@ -1,6 +1,6 @@
 @extends('layouts.form')
 @section('content')
-    <form action="{{ route(str($resource) . '.applyPreferences', [Str::singular($resource) => $primary]) }}" method="post">
+<form action="{{ route($resource . '.applyPreferences') }}" method="post">
         @csrf
         <div class="mt-5">
             <b>Sorting</b>
@@ -31,19 +31,6 @@
                     @endforeach
                 </select>
                 <label for="orderDirectionSelectInput">Sorting direction</label>
-            </div>
-        </div>
-        <div class="mt-5">
-            <b>Filters</b>
-            <div class="form-floating mt-3">
-                <select name="role_id" class="form-select" id="roleSelectInput" autofocus>
-                    <option value="">All</option>
-                    @foreach ($secondary as $option)
-                        <option value="{{ $option->id }}" @if (preference($resource . '.filters.role_id') == $option->id) selected @endif>
-                            {{ $option->name }}</option>
-                    @endforeach
-                </select>
-                <label for="roleSelectInput">Role</label>
             </div>
         </div>
         <div class="d-flex justify-content-end mt-3">
