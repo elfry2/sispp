@@ -1,9 +1,6 @@
 # SISPP
 Sistem Informasi Sumbangan Pembinaan Pendidikan. Written in Laravel 10.
 
-## About the questionable architecture and UX design decisions
-I have to comply with whatever the analyst came up with. 
-
 ## Installation
 1. Create a database
 2. Copy the ```.env.example``` file and rename it to ```.env```
