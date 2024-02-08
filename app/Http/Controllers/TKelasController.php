@@ -22,7 +22,7 @@ class TKelasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(t_kelas $t_kelas = null)
+    public function index()
     {
         $primary = '\App\Models\\' . self::resource;
 
@@ -31,7 +31,7 @@ class TKelasController extends Controller
             'title' => self::title,
             'primary'
             => (new $primary)->orderBy(
-                preference(self::resource . '.order.column', 'kd_kls'),
+                preference(self::resource . '.order.column', self::primaryKeyColumnName),
                 preference(self::resource . '.order.direction', 'ASC')
             ),
         ];

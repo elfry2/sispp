@@ -21,9 +21,7 @@ use Illuminate\Validation\Rule;
 class RegisteredUserController extends Controller
 {
     protected const resource = 'users';
-
-    protected const title = "Pengguna";
-
+    protected const title = 'Pengguna';
     protected const queryColumnNames = [
         'name',
         'username',

@@ -23,7 +23,7 @@ class TSiswaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(t_siswa $t_siswa = null)
+    public function index()
     {
         $primary = '\App\Models\\' . self::resource;
 
@@ -32,7 +32,7 @@ class TSiswaController extends Controller
             'title' => self::title,
             'primary'
             => (new $primary)->orderBy(
-                preference(self::resource . '.order.column', 'kd_kls'),
+                preference(self::resource . '.order.column', self::primaryKeyColumnName),
                 preference(self::resource . '.order.direction', 'ASC')
             ),
         ];
