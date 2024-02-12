@@ -7,6 +7,7 @@ use App\Http\Controllers\FolderController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TKelasController;
 use App\Http\Controllers\TSiswaController;
+use App\Http\Controllers\TPembayaranController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -95,5 +96,16 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::get('t_siswa/search', [TSiswaController::class, 'search'])->name('t_siswa.search');
         Route::get('t_siswa/preferences', [TSiswaController::class, 'preferences'])->name('t_siswa.preferences');
         Route::post('t_siswa/preferences', [TSiswaController::class, 'applyPreferences'])->name('t_siswa.applyPreferences');
+
+        Route::get('t_pembayaran/', [TPembayaranController::class, 'index'])->name('t_pembayaran.index');
+        Route::get('t_pembayaran/create', [TPembayaranController::class, 'create'])->name('t_pembayaran.create');
+        Route::post('t_pembayaran/store', [TPembayaranController::class, 'store'])->name('t_pembayaran.store');
+        Route::get('t_pembayaran/{id}/edit', [TPembayaranController::class, 'edit'])->name('t_pembayaran.edit');
+        Route::patch('t_pembayaran/{id}/update', [TPembayaranController::class, 'update'])->name('t_pembayaran.update');
+        Route::get('t_pembayaran/{id}/delete', [TPembayaranController::class, 'delete'])->name('t_pembayaran.delete');
+        Route::delete('t_pembayaran/{id}/destroy', [TPembayaranController::class, 'destroy'])->name('t_pembayaran.destroy');
+        Route::get('t_pembayaran/search', [TPembayaranController::class, 'search'])->name('t_pembayaran.search');
+        Route::get('t_pembayaran/preferences', [TPembayaranController::class, 'preferences'])->name('t_pembayaran.preferences');
+        Route::post('t_pembayaran/preferences', [TPembayaranController::class, 'applyPreferences'])->name('t_pembayaran.applyPreferences');
     });
 });

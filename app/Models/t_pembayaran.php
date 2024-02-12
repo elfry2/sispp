@@ -17,7 +17,7 @@ class t_pembayaran extends Model
     ];
 
     public function siswa() {
-        return $this->belongsTo(t_siswa::class, 'nis');
+        return $this->belongsTo(t_siswa::class, 'nis', 'nis');
     }
 
     public function detail() {

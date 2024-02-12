@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 
 class TPembayaranController extends Controller
 {
-    protected const resource = 't_siswa';
+    protected const resource = 't_pembayaran';
 
-    protected const title = 'Siswa';
+    protected const title = 'Pembayaran';
 
-    protected const primaryKeyColumnName = 'nis';
+    protected const primaryKeyColumnName = 'id_pembayaran';
 
     protected const queryColumnNames = [
         'id_pembayaran',
@@ -80,7 +80,12 @@ class TPembayaranController extends Controller
      */
     public function create()
     {
-        //
+        $data = (object) [
+            'resource' => self::resource,
+            'title' => 'Tambah ' . str(self::title)->lower(),
+        ];
+
+        return view(self::resource . '.create', (array) $data);
     }
 
     /**

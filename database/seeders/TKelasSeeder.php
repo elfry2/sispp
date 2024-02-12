@@ -17,15 +17,15 @@ class TKelasSeeder extends Seeder
 
         $rows = [
             [
-                'nm_kelas' => '1 TKJ 1',
+                'nm_kelas' => 'ATP 1',
                 'jumlah_siswa' => 40,
             ],
             [
-                'nm_kelas' => '2 TKJ 1',
+                'nm_kelas' => 'ATP 2',
                 'jumlah_siswa' => 40,
             ],
             [
-                'nm_kelas' => '3 TKJ 1',
+                'nm_kelas' => 'ATP 3',
                 'jumlah_siswa' => 40,
             ],
         ];

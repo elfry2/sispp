@@ -30,6 +30,9 @@
                     <div class="mt-3">
                         <b>Aplikasi</b>
                         <div class="list-group">
+                            <a href="{{ route('t_pembayaran.index') }}"
+                                class="list-group-item list-group-item-action border-0 @if (Route::is('t_pembayaran.*')) bg-body-secondary rounded @endif"><i
+                                class="bi-cash-coin"></i><span class="ms-2">Riwayat pembayaran</span></a>
                             @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('t_siswa.index') }}"
