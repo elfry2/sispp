@@ -11,6 +11,8 @@ class t_pembayaran extends Model
 {
     use HasFactory;
 
+    protected $table = 't_kelas';
+
     protected $allowed = [
         'nis',
         'total',
