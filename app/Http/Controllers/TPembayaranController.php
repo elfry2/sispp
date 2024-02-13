@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\t_dtl_pembayaran;
 use App\Models\t_pembayaran;
+use App\Models\t_siswa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TPembayaranController extends Controller
 {
@@ -21,7 +24,7 @@ class TPembayaranController extends Controller
 
     protected const validationRules = [
         't_pembayaran' => [
-            'id_pembayaran' => 'required||integer|min:0|unique:t_pembayaran,id_pembayaran',
+            // 'id_pembayaran' => 'required||integer|min:0|unique:t_pembayaran,id_pembayaran',
             'tgl' => 'required|date',
             'nis' => 'required|numeric|digits_between:0,20',
             'total' => 'required|decimal:0,2|min:0',
@@ -29,7 +32,7 @@ class TPembayaranController extends Controller
         't_dtl_pembayaran' => [
             'id_pembayaran' => 'required|integer|exists:t_pembayaran,id_pembayaran',
             'tahun_pembayaran' => 'required|integer|min:0',
-            'bulan' => 'required|integer|min:1|max:12',
+            'bulan' => 'required|integer|min:0|max:11',
             'jumlah' => 'required|decimal:0,2|min:0'
         ],
     ];
@@ -39,14 +42,14 @@ class TPembayaranController extends Controller
      */
     public function index()
     {
-        $primary = '\App\Models\\' . self::resource;
+        $primary = '\App\Models\t_siswa';
 
         $data = (object) [
             'resource' => self::resource,
             'title' => self::title,
             'primary'
             => (new $primary)->orderBy(
-                preference(self::resource . '.order.column', self::primaryKeyColumnName),
+                preference(self::resource . '.order.column', 'nis'),
                 preference(self::resource . '.order.direction', 'ASC')
             ),
         ];
@@ -83,7 +86,26 @@ class TPembayaranController extends Controller
         $data = (object) [
             'resource' => self::resource,
             'title' => 'Tambah ' . str(self::title)->lower(),
+            'primary' => t_siswa::all(),
         ];
+
+        if(request('nis') && request('tahun_pembayaran')) {
+
+            $validated = (object) request()->validate([
+                'nis' => 'required|numeric|digits_between:0,20',
+                'tahun_pembayaran' => 'required|integer',
+            ]);
+
+            $data->secondary = new ('App\Models\\' . self::resource);
+
+            $data->secondary
+                = $data->secondary->where('nis', $validated->nis);
+            $data->secondary = $data->secondary->get();
+            $data->secondary = $data->secondary->map(function($row) {
+                return $row->bulan;
+            });
+        }
+
 
         return view(self::resource . '.create', (array) $data);
     }
@@ -115,9 +137,51 @@ class TPembayaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, t_pembayaran $t_pembayaran)
+    public function update(Request $request, $id)
     {
-        //
+        $validationRules = (object) self::validationRules;
+
+        $validated = (object) $request->validate([
+            'bulan' => 'nullable|array',
+        ]);
+
+        $bulan = collect($request->bulan ?: []);
+
+        $request->merge([
+            'nis' => $id,
+            'tgl' => date('Y-m-d H:i:s'),
+            'total' => 0,
+        ]);
+
+        for($i = 0; $i < 12; $i++) {
+
+            if(!$bulan->has($i)) continue;
+
+            $validated = $request->validate($validationRules->t_pembayaran);
+
+            $payment = t_pembayaran::create($validated);
+
+            $entry = [
+                'id_pembayaran' => $payment->id,
+                'tahun_pembayaran' => $request->tahun_pembayaran,
+                'bulan' => $i,
+                'jumlah' => $payment->siswa->spp_perbulan,
+            ];
+
+            $validated = Validator::make(
+                $entry,
+                $validationRules->t_dtl_pembayaran
+            )->validate();
+
+            t_dtl_pembayaran::create($validated);
+        }
+
+        return redirect(route(self::resource . '.index'))->with([
+            'message' => (object) [
+                'type' => 'success',
+                'content' => self::title . ' disunting.'
+            ]
+        ]);
     }
 
     /**

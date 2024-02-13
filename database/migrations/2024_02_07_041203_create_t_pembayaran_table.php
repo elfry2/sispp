@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('tgl');
             $table->string('nis');
             $table->foreign('nis')->references('nis')->on('t_siswa');
-            $table->decimal('total');
+            $table->decimal('total')->nullable();
             $table->timestamps();
         });
     }

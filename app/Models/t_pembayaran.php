@@ -11,9 +11,11 @@ class t_pembayaran extends Model
 {
     use HasFactory;
 
-    protected $table = 't_kelas';
+    protected $table = 't_pembayaran';
 
-    protected $allowed = [
+    protected $fillable = [
+        'id_pembayaran',
+        'tgl',
         'nis',
         'total',
     ];
@@ -23,6 +25,6 @@ class t_pembayaran extends Model
     }
 
     public function detail() {
-        return $this->hasOne(t_dtl_pembayaran::class);
+        return $this->hasOne(t_dtl_pembayaran::class, 'id_detail_pembayaran', 'id_pembayaran');
     }
 }

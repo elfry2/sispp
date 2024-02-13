@@ -9,7 +9,9 @@ class t_dtl_pembayaran extends Model
 {
     use HasFactory;
 
-    protected $allowed = [
+    protected $table = 't_dtl_pembayaran';
+
+    protected $fillable = [
         'id_pembayaran',
         'tahun_pembayaran',
         'bulan',

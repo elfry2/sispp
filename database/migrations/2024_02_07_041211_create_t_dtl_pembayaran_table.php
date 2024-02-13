@@ -20,7 +20,7 @@ return new class extends Migration
                 ->on('t_pembayaran');
             $table->integer('tahun_pembayaran');
             $table->integer('bulan');
-            $table->decimal('jumlah');
+            $table->decimal('jumlah', 9, 2);
             $table->timestamps();
         });
     }
