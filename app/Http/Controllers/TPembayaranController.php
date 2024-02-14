@@ -75,6 +75,38 @@ class TPembayaranController extends Controller
         $data->primary = $data->primary
                               ->paginate(config('app.rowsPerPage'))->withQueryString();
 
+        $data->primary->map(function($row) {
+            $payments = $row->pembayaran;
+
+            $paymentDetails = $payments->map(function ($payment) {
+                return $payment->detail;
+            });
+
+            $firstPaymentDetail = $paymentDetails->sortBy([
+                ['tahun_pembayaran', 'asc'],
+                ['bulan', 'asc']
+            ])->first();
+
+            if(is_null($firstPaymentDetail)) return $row;
+
+            $current = (object) [
+                'year' => date('Y'),
+                'month' => date('m'),
+            ];
+
+            $monthsSinceFirstPayment
+                = ($current->year - $firstPaymentDetail->tahun_pembayaran) * 12;
+
+            $monthsSinceFirstPayment -= $firstPaymentDetail->bulan;
+
+            $monthsSinceFirstPayment += ($current->month - 1);
+
+            $row->tunggakan
+                = $monthsSinceFirstPayment - $row->pembayaran->count();
+
+            return $row;
+        });
+
         return view(self::resource . '.index', (array) $data);
     }
 
@@ -100,9 +132,21 @@ class TPembayaranController extends Controller
 
             $data->secondary
                 = $data->secondary->where('nis', $validated->nis);
+
+            $data->secondary
+                = $data->secondary
+                       ->whereHas('detail', function($query) use ($validated) {
+
+                           return $query->where(
+                               'tahun_pembayaran',
+                               $validated->tahun_pembayaran
+                           );
+                       });
+
             $data->secondary = $data->secondary->get();
+
             $data->secondary = $data->secondary->map(function($row) {
-                return $row->bulan;
+                return $row->detail->bulan;
             });
         }
 
@@ -155,14 +199,51 @@ class TPembayaranController extends Controller
 
         for($i = 0; $i < 12; $i++) {
 
-            if(!$bulan->has($i)) continue;
+            if($bulan->search($i) === false) {
+
+                $validated = (object) Validator::make($request->all(), [
+                    'nis' => 'required|numeric|digits_between:0,20',
+                    'tahun_pembayaran' => 'required|integer|min:0',
+                ])->validate();
+
+                $payments = t_pembayaran::where('nis', $validated->nis)
+                    ->whereHas('detail', function($query) use ($validated) {
+
+                        return $query->where(
+                            'tahun_pembayaran',
+                            $validated->tahun_pembayaran
+                        );
+                    })->whereHas('detail', function($query) use ($i) {
+
+                        return $query->where('bulan', $i);
+                    })->get();
+
+                foreach ($payments as $payment) {
+
+                    $payment->detail()->delete();
+
+                    $payment->delete();
+                }
+
+                continue;
+            }
 
             $validated = $request->validate($validationRules->t_pembayaran);
+
+            $oldPaymentExists = t_pembayaran::where('nis', $request->nis)
+                ->whereHas('detail', function($query) use ($request, $i) {
+
+                    return $query
+                        ->where('tahun_pembayaran', $request->tahun_pembayaran)
+                        ->where('bulan', $i);
+                })->first() != false;
+
+            if($oldPaymentExists) continue;
 
             $payment = t_pembayaran::create($validated);
 
             $entry = [
-                'id_pembayaran' => $payment->id,
+                'id_pembayaran' => $payment->id_pembayaran,
                 'tahun_pembayaran' => $request->tahun_pembayaran,
                 'bulan' => $i,
                 'jumlah' => $payment->siswa->spp_perbulan,
@@ -176,7 +257,7 @@ class TPembayaranController extends Controller
             t_dtl_pembayaran::create($validated);
         }
 
-        return redirect(route(self::resource . '.index'))->with([
+        return redirect()->back()->with([
             'message' => (object) [
                 'type' => 'success',
                 'content' => self::title . ' disunting.'

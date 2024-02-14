@@ -30,7 +30,7 @@
             filteredStudents.forEach(function(student) {
                 studentSuggestions.innerHTML += `<a href="#"
                     class="mt-2 btn border-0 btn-outline-{{ preference('theme') === 'dark' ? 'light' : 'dark' }} d-block text-start"
-                    onclick="nisTextInput.value = ${student.nis}; studentSuggestions.innerHTML = ''; tahunPembayaranNumberInput.focus()"
+                    onclick="nisTextInput.value = ${String(student.nis)}; studentSuggestions.innerHTML = ''; tahunPembayaranNumberInput.focus()"
                 >${student.nis} - ${student.nama_siswa}</a>`;
             })
         })
@@ -70,10 +70,11 @@
         @for($i = 0; $i < 2; $i++)
         <div class="col mt-3">
             @for($j = 0; $j < count($months) / 2; $j++)
+            @php $monthIndex = $j + ($i * 6); @endphp
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="bulan[]" value="{{ $j }}" @if($secondary->has($j + ($i * 6))) checked @endif id="month{{ $j + ($i * 6) }}CheckBoxInput">
-                <label class="form-check-label" for="month{{ $j + ($i * 6) }}CheckBoxInput">
-                    {{ $months[$j + ($i * 6)] }}
+                <input class="form-check-input" type="checkbox" name="bulan[]" value="{{ $monthIndex }}" @if($secondary->search($monthIndex) !== false) checked @endif id="month{{ $monthIndex }}CheckBoxInput">
+                <label class="form-check-label" for="month{{ $monthIndex }}CheckBoxInput">
+                    {{ $months[$monthIndex] }}
                 </label>
             </div>
             @endfor

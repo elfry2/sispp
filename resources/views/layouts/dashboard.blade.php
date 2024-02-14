@@ -24,15 +24,18 @@
                         <span class="hide-on-big-screens me-2">
                             @include('components.sidenav-visibility-toggle-button')
                         </span>
-                        <a class="fs-5 text-{{ preference('theme') == 'light' ? 'dark' : 'light' }} fw-bold" href="{{ route('home.index') }}">{{ config('app.name') }}</a>
+                        <a class="fs-5 text-{{ preference('theme', 'light') == 'light' ? 'dark' : 'light' }} fw-bold" href="{{ route('home.index') }}">{{ config('app.name') }}</a>
                         <div class="btn invisible"><i class="bi-moon"></i></div>
                     </div>
                     <div class="mt-3">
                         <b>Aplikasi</b>
                         <div class="list-group">
+                            <a href="{{ route('summary.index') }}"
+                                class="list-group-item list-group-item-action border-0 @if (Route::is('summary.*')) bg-body-secondary rounded @endif"><i
+                                class="bi-card-text"></i><span class="ms-2">Ikhtisar</span></a>
                             <a href="{{ route('t_pembayaran.index') }}"
                                 class="list-group-item list-group-item-action border-0 @if (Route::is('t_pembayaran.*')) bg-body-secondary rounded @endif"><i
-                                class="bi-cash-coin"></i><span class="ms-2">Riwayat pembayaran</span></a>
+                                class="bi-cash-coin"></i><span class="ms-2">Pembayaran</span></a>
                             @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('t_siswa.index') }}"

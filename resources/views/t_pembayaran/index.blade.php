@@ -18,7 +18,7 @@
             <th>Kelas</th>
             <th>Nama orang tua</th>
             <th>Biaya SPP</th>
-            <th>Jatuh tempo</th>
+            <th>Tunggakan</th>
         </tr>
         @foreach ($primary as $row)
         <tr id="row{{ $loop->index + 1 }}" style="cursor: pointer">
@@ -29,7 +29,7 @@
             <td>{{ $row->kelas->nm_kelas }}</td>
             <td>{{ $row->nama_orang_tua }}</td>
             <td>Rp. {{ (int) $row->spp_perbulan }}</td>
-            <td class="text-{{ $row->debt ? 'danger' : 'success' }}">{{ $row->debt ? 'Ya' : 'Tidak' }}</td>
+            <td class="text-{{ $row->tunggakan ? 'danger' : 'success' }}">{{ $row->tunggakan ? $row->tunggakan . ' bulan' : 'Tidak ada' }}</td>
         </tr>
         @endforeach
     </table>

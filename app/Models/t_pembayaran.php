@@ -13,6 +13,8 @@ class t_pembayaran extends Model
 
     protected $table = 't_pembayaran';
 
+    protected $primaryKey = 'id_pembayaran';
+
     protected $fillable = [
         'id_pembayaran',
         'tgl',
@@ -25,6 +27,6 @@ class t_pembayaran extends Model
     }
 
     public function detail() {
-        return $this->hasOne(t_dtl_pembayaran::class, 'id_detail_pembayaran', 'id_pembayaran');
+        return $this->hasOne(t_dtl_pembayaran::class, 'id_pembayaran', 'id_pembayaran');
     }
 }

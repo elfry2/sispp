@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\t_kelas;
+use App\Models\t_pembayaran;
 
 class t_siswa extends Model
 {
@@ -27,5 +28,9 @@ class t_siswa extends Model
 
     public function kelas() {
         return $this->belongsTo(t_kelas::class, 'kd_kls', 'kd_kls');
+    }
+
+    public function pembayaran() {
+        return $this->hasMany(t_pembayaran::class, 'nis', 'nis');
     }
 }
