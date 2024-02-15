@@ -4,6 +4,7 @@ use App\Http\Controllers\PreferenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\FolderController;
+use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TKelasController;
 use App\Http\Controllers\TSiswaController;
@@ -29,7 +30,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     // return view('dashboard');
-    return redirect(route('t_pembayaran.index'));
+    return redirect(route('summary.index'));
 })->middleware(['auth', 'verified', 'notSuspended'])->name('dashboard');
 
 Route::get('register', [RegisteredUserController::class, 'create'])
@@ -76,7 +77,7 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
     Route::get('t_pembayaran/preferences', [TPembayaranController::class, 'preferences'])->name('t_pembayaran.preferences');
     Route::post('t_pembayaran/preferences', [TPembayaranController::class, 'applyPreferences'])->name('t_pembayaran.applyPreferences');
 
-    Route::get('summary', function(){})->name('summary.index');
+    Route::get('summary', [SummaryController::class, 'index'])->name('summary.index');
 
     Route::middleware('admin')->group(function() {
 

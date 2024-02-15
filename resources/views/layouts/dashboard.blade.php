@@ -86,11 +86,15 @@
                     @include('components.sidenav-visibility-toggle-button')
                     <h5 class="m-0 ms-2 me-auto">{{ $title ?? '' }}</h5>
                     <div class="ms-2"></div>
-                    @include('components.search')
+                    @if(!Route::is('summary.*'))
+                        @include('components.search')
+                    @endif
                     <div class="ms-2"></div>
                     @yield('topnav')
-                    @include('components.' . (Route::is('tasks.*') ? 'task-' : '') . 'creation-button')
-                    @include('components.pagination-buttons')
+                    @if(!Route::is('summary.*'))
+                        @include('components.' . (Route::is('tasks.*') ? 'task-' : '') . 'creation-button')
+                        @include('components.pagination-buttons')
+                    @endif
                 </div>
                 <div class="mt-3" id="content">
                     @include('components.messages')
@@ -102,7 +106,9 @@
                         @if(!Route::is('tasks.*'))
                             @yield('bottomnav')
                         @endif
-                        @include('components.pagination-buttons')
+                        @if(!Route::is('summary.*'))
+                            @include('components.pagination-buttons')
+                        @endif
                     </div>
                     <div class="mt-2 hide-on-small-screens"></div>
                     <div class="hide-on-big-screens" style="height: 6em"></div>
