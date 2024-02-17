@@ -335,7 +335,9 @@ class TPembayaranController extends Controller
 
         $sheet = $spreadsheet->getActiveWorksheet();
 
-        $sheet->setCellValue('A1', 'Laporan Pembayaran SPP');
+        $currentRow = 1;
+
+        $sheet->setCellValue('A' . $currentRow, 'Laporan Pembayaran SPP');
 
         $months = [
             'Januari',
@@ -352,12 +354,14 @@ class TPembayaranController extends Controller
             'Desember'
         ];
 
+        $currentRow++;
+
         if(!is_null($validated->kelas)) {
 
             $class = t_kelas->find($validated->kelas);
 
             $cell = (object) [
-                'coordinate' => 'A1',
+                'coordinate' => 'A' . $currentRow,
                 'value' => 'Kelas ' . $class->nm_kelas;
             ];
 
@@ -385,7 +389,7 @@ class TPembayaranController extends Controller
             ];
 
             $cell = (object) [
-                'coordinate' => 'A2',
+                'coordinate' =>  'A' . $currentRow,
                 'value' => $months[$validated->bulan];
             ];
 
@@ -400,7 +404,7 @@ class TPembayaranController extends Controller
         if(!is_null($validated->tahun_pembayaran)) {
 
             $cell = (object) [
-                'coordinate' => 'A2',
+                'coordinate' => 'A' . $currentRow,
                 'value' => $validated->tahun_pembayaran;
             ];
 
@@ -412,6 +416,8 @@ class TPembayaranController extends Controller
                 $sheet->getCell($cell->coordinate)->value . $cell->value
             );
         }
+
+        $currentRow += 2;
 
         $columns = [
             'No',
@@ -425,7 +431,7 @@ class TPembayaranController extends Controller
         ];
 
         foreach ($columns as $index => $column)
-            $sheet->setCellValue(${range('a', 'z')[$index] . '4', $column);
+            $sheet->setCellValue(range('a', 'z')[$index] . $currentRow, $column);
 
         // ...
     }
