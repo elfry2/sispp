@@ -1,6 +1,7 @@
 @extends('layouts.dashboard')
 @section('topnav')
 @include('components.preferences-button')
+<a href="{{ route($resource . '.generateReport') }}" class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }} ms-2" title="Buat laporan {{ str($title)->lower() }}"><i class="bi-file-earmark-spreadsheet"></i></a>
 @endsection
 @section('bottomnav')
 @endsection

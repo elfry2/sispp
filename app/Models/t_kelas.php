@@ -12,6 +12,8 @@ class t_kelas extends Model
 
     protected $table = 't_kelas';
 
+    protected $primaryKey = 'kd_kls';
+
     protected $fillable = [
         'nm_kelas',
         'jumlah_siswa',

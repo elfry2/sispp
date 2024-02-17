@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\t_dtl_pembayaran;
-use App\Models\t_pembayaran;
-use App\Models\t_siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\t_dtl_pembayaran;
+use App\Models\t_pembayaran;
+use App\Models\t_kelas;
+use App\Models\t_siswa;
 
 class TPembayaranController extends Controller
 {
@@ -271,5 +274,163 @@ class TPembayaranController extends Controller
     public function destroy(t_pembayaran $t_pembayaran)
     {
         //
+    }
+
+    public function generateReport(Request $request) {
+
+        if($request->isMethod('get')) {
+
+            $data = [
+                'title' => 'Buat laporan ' . str(self::title)->lower(),
+                'resource' => self::resource,
+                'primary' => t_kelas::all(),
+                'secondary'
+                    => t_dtl_pembayaran::distinct()->pluck('tahun_pembayaran'),
+            ];
+
+            return view(self::resource . '.generate-report', $data);
+        }
+
+        $validated = (object) $request->validate([
+            'tahun_pembayaran' => 'nullable|integer|min:0',
+            'bulan' => 'nullable|integer|min:0|max:11',
+            'kelas' => 'nullable|integer|exists:t_kelas,kd_kls',
+        ]);
+
+        $payments = new t_pembayaran;
+
+        if(!is_null($validated->kelas)) {
+
+            $payments = $payments
+                ->whereHas('siswa', function($query) use ($validated) {
+
+                    return $query->where('kd_kls', $validated->kelas);
+            });
+        }
+
+        if(!is_null($validated->tahun_pembayaran)) {
+
+            $payments = $payments
+                ->whereHas('detail', function($query) use ($validated) {
+
+                    return $query->where(
+                        'tahun_pembayaran',
+                        $validated->tahun_pembayaran
+                    );
+            });
+        }
+
+        if(!is_null($validated->bulan)) {
+
+            $payments = $payments
+                ->whereHas('detail', function($query) use ($validated) {
+
+                return $query->where('bulan', $validated->bulan);
+            });
+        }
+
+        $payments = $payments->get();
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveWorksheet();
+
+        $sheet->setCellValue('A1', 'Laporan Pembayaran SPP');
+
+        $months = [
+            'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ];
+
+        if(!is_null($validated->kelas)) {
+
+            $class = t_kelas->find($validated->kelas);
+
+            $cell = (object) [
+                'coordinate' => 'A1',
+                'value' => 'Kelas ' . $class->nm_kelas;
+            ];
+
+            $sheet->setCellValue(
+                $cell->coordinate,
+                $sheet->getCell($cell->coordinate)->value . $cell->value
+            );
+        }
+
+        if(!is_null($validated->bulan)) {
+
+            $months = [
+                'Januari',
+                'Februari',
+                'Maret',
+                'April',
+                'Mei',
+                'Juni',
+                'Juli',
+                'Agustus',
+                'September',
+                'Oktober',
+                'November',
+                'Desember'
+            ];
+
+            $cell = (object) [
+                'coordinate' => 'A2',
+                'value' => $months[$validated->bulan];
+            ];
+
+            if(!is_null($validated->kelas)) $cell->value = ' ' . $cell->value;
+
+            $sheet->setCellValue(
+                $cell->coordinate,
+                $sheet->getCell($cell->coordinate)->value . $cell->value
+            );
+        }
+
+        if(!is_null($validated->tahun_pembayaran)) {
+
+            $cell = (object) [
+                'coordinate' => 'A2',
+                'value' => $validated->tahun_pembayaran;
+            ];
+
+            if(!is_null($validated->kelas) || !is_null($validated->bulan))
+                $cell->value = ' ' . $cell->value;
+
+            $sheet->setCellValue(
+                $cell->coordinate,
+                $sheet->getCell($cell->coordinate)->value . $cell->value
+            );
+        }
+
+        $columns = [
+            'No',
+            'NIS',
+            'Nama siswa',
+            'Jenis kelamin',
+            'Kelas',
+            'Nama orang tua',
+            'Biaya SPP',
+            'Tunggakan',
+        ];
+
+        foreach ($columns as $index => $column)
+            $sheet->setCellValue(${range('a', 'z')[$index] . '4', $column);
+
+        // ...
+    }
+
+    public function viewReport(Type $var = null) {
+        # code...
     }
 }
