@@ -20,6 +20,6 @@ class t_kelas extends Model
     ];
 
     public function siswa() {
-        return $this->hasMany(t_siswa::class);
+        return $this->hasMany(t_siswa::class, 'kd_kls');
     }
 }

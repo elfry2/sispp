@@ -78,7 +78,7 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
     Route::post('t_pembayaran/preferences', [TPembayaranController::class, 'applyPreferences'])->name('t_pembayaran.applyPreferences');
     Route::get('t_pembayaran/generate-report', [TPembayaranController::class, 'generateReport'])->name('t_pembayaran.generateReport');
     Route::post('t_pembayaran/generate-report', [TPembayaranController::class, 'generateReport'])->name('t_pembayaran.generateReport');
-    Route::get('t_pembayaran/view-report', [TPembayaranController::class, 'viewReport'])->name('t_pembayaran.viewReport');
+    Route::get('t_pembayaran/reports/{fileName}', [TPembayaranController::class, 'showReport'])->name('t_pembayaran.showReport');
 
     Route::get('summary', [SummaryController::class, 'index'])->name('summary.index');
 

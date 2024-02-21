@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\t_dtl_pembayaran;
 use App\Models\t_pembayaran;
@@ -79,6 +83,7 @@ class TPembayaranController extends Controller
                               ->paginate(config('app.rowsPerPage'))->withQueryString();
 
         $data->primary->map(function($row) {
+
             $payments = $row->pembayaran;
 
             $paymentDetails = $payments->map(function ($payment) {
@@ -285,7 +290,7 @@ class TPembayaranController extends Controller
                 'resource' => self::resource,
                 'primary' => t_kelas::all(),
                 'secondary'
-                    => t_dtl_pembayaran::distinct()->pluck('tahun_pembayaran'),
+                => t_dtl_pembayaran::distinct()->pluck('tahun_pembayaran'),
             ];
 
             return view(self::resource . '.generate-report', $data);
@@ -295,49 +300,118 @@ class TPembayaranController extends Controller
             'tahun_pembayaran' => 'nullable|integer|min:0',
             'bulan' => 'nullable|integer|min:0|max:11',
             'kelas' => 'nullable|integer|exists:t_kelas,kd_kls',
+            'punya_tunggakan' => 'nullable|integer|min:0|max:2',
         ]);
 
-        $payments = new t_pembayaran;
+        $students = new t_siswa;
 
         if(!is_null($validated->kelas)) {
 
-            $payments = $payments
-                ->whereHas('siswa', function($query) use ($validated) {
-
-                    return $query->where('kd_kls', $validated->kelas);
-            });
+            $students = $students->where('kd_kls', $validated->kelas);
         }
 
         if(!is_null($validated->tahun_pembayaran)) {
 
-            $payments = $payments
-                ->whereHas('detail', function($query) use ($validated) {
+            $students = $students
+                ->whereHas('pembayaran', function($query) use ($validated) {
 
-                    return $query->where(
-                        'tahun_pembayaran',
-                        $validated->tahun_pembayaran
-                    );
-            });
+                    return $query
+                        ->whereHas('detail', function($query) use ($validated) {
+
+                            return $query->where(
+                                'tahun_pembayaran',
+                                $validated->tahun_pembayaran
+                            );
+                        });
+                });
         }
 
         if(!is_null($validated->bulan)) {
 
-            $payments = $payments
-                ->whereHas('detail', function($query) use ($validated) {
+            $students = $students
+                ->whereHas('pembayaran', function($query) use ($validated) {
 
-                return $query->where('bulan', $validated->bulan);
-            });
+                    return $query
+                        ->whereHas('detail', function($query) use ($validated) {
+
+                            return $query->where(
+                                'bulan',
+                                $validated->bulan
+                            );
+                        });
+                });
         }
 
-        $payments = $payments->get();
+        $students = $students->get();
+
+        $students->map(function($student) {
+
+            $payments = $student->pembayaran;
+
+            $paymentDetails = $payments->map(function ($payment) {
+                return $payment->detail;
+            });
+
+            $firstPaymentDetail = $paymentDetails->sortBy([
+                ['tahun_pembayaran', 'asc'],
+                ['bulan', 'asc']
+            ])->first();
+
+            if(is_null($firstPaymentDetail)) return $student;
+
+            $current = (object) [
+                'year' => date('Y'),
+                'month' => date('m'),
+            ];
+
+            $monthsSinceFirstPayment
+                = ($current->year - $firstPaymentDetail->tahun_pembayaran) * 12;
+
+            $monthsSinceFirstPayment -= $firstPaymentDetail->bulan;
+
+            $monthsSinceFirstPayment += ($current->month - 1);
+
+            $student->tunggakan
+                = $monthsSinceFirstPayment - $student->pembayaran()->count();
+
+            return $student;
+        });
+
+        if(!is_null($validated->punya_tunggakan)) {
+
+            switch($validated->punya_tunggakan) {
+
+            case '1':
+                $students = $students->filter(function ($student) {
+                    return $student->tunggakan > 0;
+                });
+                break;
+
+            case '2':
+                $students = $students->filter(function ($student) {
+                    return $student->tunggakan === 0;
+                });
+                break;
+
+            default:
+                break;
+            }
+        }
 
         $spreadsheet = new Spreadsheet();
 
-        $sheet = $spreadsheet->getActiveWorksheet();
+        $sheet = $spreadsheet->getActiveSheet();
 
         $currentRow = 1;
 
-        $sheet->setCellValue('A' . $currentRow, 'Laporan Pembayaran SPP');
+        $sheetTitle = 'Laporan Pembayaran SPP';
+
+        if(
+            !is_null($validated->punya_tunggakan)
+            && $validated->punya_tunggakan == 1
+        ) $sheetTitle .= ' yang Menunggak';
+
+        $sheet->setCellValue('A' . $currentRow, $sheetTitle);
 
         $months = [
             'Januari',
@@ -358,16 +432,16 @@ class TPembayaranController extends Controller
 
         if(!is_null($validated->kelas)) {
 
-            $class = t_kelas->find($validated->kelas);
+            $class = t_kelas::find($validated->kelas);
 
             $cell = (object) [
                 'coordinate' => 'A' . $currentRow,
-                'value' => 'Kelas ' . $class->nm_kelas;
+                'value' => 'Kelas ' . $class->nm_kelas,
             ];
 
             $sheet->setCellValue(
                 $cell->coordinate,
-                $sheet->getCell($cell->coordinate)->value . $cell->value
+                $sheet->getCell($cell->coordinate)->getValue() . $cell->value
             );
         }
 
@@ -390,14 +464,14 @@ class TPembayaranController extends Controller
 
             $cell = (object) [
                 'coordinate' =>  'A' . $currentRow,
-                'value' => $months[$validated->bulan];
+                'value' => $months[$validated->bulan],
             ];
 
             if(!is_null($validated->kelas)) $cell->value = ' ' . $cell->value;
 
             $sheet->setCellValue(
                 $cell->coordinate,
-                $sheet->getCell($cell->coordinate)->value . $cell->value
+                $sheet->getCell($cell->coordinate)->getValue() . $cell->value
             );
         }
 
@@ -405,7 +479,7 @@ class TPembayaranController extends Controller
 
             $cell = (object) [
                 'coordinate' => 'A' . $currentRow,
-                'value' => $validated->tahun_pembayaran;
+                'value' => $validated->tahun_pembayaran,
             ];
 
             if(!is_null($validated->kelas) || !is_null($validated->bulan))
@@ -413,7 +487,7 @@ class TPembayaranController extends Controller
 
             $sheet->setCellValue(
                 $cell->coordinate,
-                $sheet->getCell($cell->coordinate)->value . $cell->value
+                $sheet->getCell($cell->coordinate)->getValue() . $cell->value
             );
         }
 
@@ -433,10 +507,77 @@ class TPembayaranController extends Controller
         foreach ($columns as $index => $column)
             $sheet->setCellValue(range('a', 'z')[$index] . $currentRow, $column);
 
-        // ...
+        foreach($students as $index => $student) {
+
+            $currentRow++;
+
+            $row = [
+                $index + 1,
+                $student->nis,
+                $student->nama_siswa,
+                $student->jk ? 'Laki-laki' : 'Perempuan',
+                $student->kelas->nm_kelas,
+                $student->nama_orang_tua,
+                $student->spp_perbulan,
+                $student->tunggakan,
+            ];
+
+            foreach($row as $index => $cell) $sheet->setCellValue(
+                range('a', 'z')[$index] . $currentRow,
+                $cell
+            );
+        }
+
+        foreach([1, 2] as $row) $sheet->mergeCells("A${row}:H{$row}");
+
+        $sheet->getStyle("A1:H4")->getFont()->setBold(true);
+
+        $sheet->getStyle("A1:H4")->getAlignment()->setHorizontal('center');
+
+        for ($i=4; $i <= $currentRow; $i++) {
+
+            $row = $i;
+
+            foreach(range('A', 'H') as $column) {
+
+                $sheet->getStyle($column . $row)
+                  ->getBorders()
+                  ->getOutline()
+                  ->setBorderStyle(Border::BORDER_THIN)
+                  ->setColor(new Color('#000'));
+            }
+        }
+
+        foreach ($sheet->getColumnIterator() as $column) {
+           $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = Str::uuid() . '.xlsx';
+
+        $directoryPath = "app/public/reports/payments/";
+
+        Storage::put($directoryPath . $fileName, 'aaa');
+
+        $writer->save(storage_path($directoryPath . $fileName));
+
+        return redirect(route(self::resource . '.showReport', [
+            'fileName' => $fileName
+        ]));
     }
 
-    public function viewReport(Type $var = null) {
-        # code...
+    public function showReport($fileName) {
+
+        $data = (object) [
+            'title' => 'Laporan berhasil dibuat',
+            'resource' => self::resource,
+        ];
+
+        $directoryPath = "reports/payments/";
+
+        $data->url = asset('storage/' . $directoryPath . $fileName);
+
+        return view(self::resource . '.show-report', (array) $data);
     }
 }

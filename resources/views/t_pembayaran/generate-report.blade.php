@@ -42,6 +42,18 @@
         </select>
         <label for="monthSelectInput">Bulan</label>
     </div>
+    <div class="form-floating mt-3">
+        <select class="form-select mt-3" name="punya_tunggakan" id="hasDebtSelectInput">
+            <option value="" selected>Semua</option>
+            @foreach([
+                'Menunggak',
+                'Tidak memiliki tunggakan',
+            ] as $option)
+                <option value="{{ $loop->index + 1 }}">{{ $option }}</option>
+            @endforeach
+        </select>
+        <label for="hasDebtSelectInput">Punya tunggakan</label>
+    </div>
     <div class="d-flex justify-content-end mt-3">
         <button class="btn border-0 btn-outline-{{ preference('theme') == 'dark' ? 'light' : 'dark' }}" type="submit"><i class="bi-send"></i><span class="ms-2">Buat</span></button>
     </div>
