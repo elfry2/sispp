@@ -102,6 +102,9 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::get('t_kelas/search', [TKelasController::class, 'search'])->name('t_kelas.search');
         Route::get('t_kelas/preferences', [TKelasController::class, 'preferences'])->name('t_kelas.preferences');
         Route::post('t_kelas/preferences', [TKelasController::class, 'applyPreferences'])->name('t_kelas.applyPreferences');
+        Route::get('t_kelas/generate-report', [TKelasController::class, 'showReportGenerationForm'])->name('t_kelas.showReportGenerationForm');
+        Route::post('t_kelas/generate-report', [TKelasController::class, 'generateReport'])->name('t_kelas.generateReport');
+        Route::get('t_kelas/reports/{fileName}', [TKelasController::class, 'showReportDownloadForm'])->name('t_kelas.showReportDownloadForm');
 
         Route::get('t_siswa/', [TSiswaController::class, 'index'])->name('t_siswa.index');
         Route::get('t_siswa/create', [TSiswaController::class, 'create'])->name('t_siswa.create');

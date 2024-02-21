@@ -1,6 +1,7 @@
 @extends('layouts.dashboard')
 @section('topnav')
 @include('components.preferences-button')
+@include('components.unfiltered-report-generation-button')
 @endsection
 @section('bottomnav')
 @endsection
