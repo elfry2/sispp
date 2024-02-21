@@ -409,7 +409,7 @@ class TPembayaranController extends Controller
         if(
             !is_null($validated->punya_tunggakan)
             && $validated->punya_tunggakan == 1
-        ) $sheetTitle .= ' yang Menunggak';
+        ) $sheetTitle .= ' Jatuh Tempo';
 
         $sheet->setCellValue('A' . $currentRow, $sheetTitle);
 
@@ -519,7 +519,7 @@ class TPembayaranController extends Controller
                 $student->kelas->nm_kelas,
                 $student->nama_orang_tua,
                 $student->spp_perbulan,
-                $student->tunggakan,
+                $student->tunggakan ? $student->tunggakan . ' bulan' : 'Tidak ada',
             ];
 
             foreach($row as $index => $cell) $sheet->setCellValue(
