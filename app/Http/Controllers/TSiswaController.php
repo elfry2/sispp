@@ -5,8 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Models\Folder;
 use App\Models\t_siswa;
 use App\Models\t_kelas;
@@ -272,5 +277,128 @@ class TSiswaController extends Controller
 
         return view(self::resource . '.search', (array) $data);
     }
+
+    public function showReportGenerationForm() {
+
+        $data = (object) [
+            'title' => 'Buat laporan ' . str(self::title)->lower(),
+        ];
+
+        return view(self::resource . '.generate-report', (array) $data);
+    }
+
+    public function generateReport(Request $request) {
+
+        // $validated = (object) $request->validate([
+        //     //
+        // ]);
+
+        $primary = new ('App\Models\\' . self::resource);
+
+        // if(!is_null($validated->property))
+        //     $primary->where('column', 'value');
+
+        $primary = $primary->get();
+
+        $rows = [
+            ['Laporan Data ' . self::title],
+            [],
+            [],
+        ];
+
+        $currentRowIndex = count($rows);
+
+        $columnTitles = [
+            'No.',
+            'NIS',
+            'Nama Siswa',
+            'Alamat',
+            'Tgl Lahir',
+            'Tempat Lahir',
+            'Jenis Kelamin',
+            'Kelas',
+        ];
+
+        $rows[$currentRowIndex++] = $columnTitles;
+
+        foreach ($primary as $index => $row) $rows[$currentRowIndex++] = [
+            $index+1,
+            $row->nis,
+            $row->nama_siswa,
+            $row->alamat,
+            $row->tgl_lahir,
+            $row->tempat_lahir,
+            $row->jk,
+            $row->kelas->nm_kelas,
+        ];
+
+        $spreadsheet = new Spreadsheet();
+
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray($rows, null);
+
+        $sheet->mergeCells('A1:' . range('a', 'z')[count($columnTitles)-1] . '1');
+
+        $sheet->getStyle('A1:' . range('a', 'z')[count($columnTitles)-1] . '4')
+              ->getFont()
+              ->setBold(true);
+
+        $sheet->getStyle('A1:' . range('a', 'z')[count($columnTitles)-1] . '4')
+              ->getAlignment()
+              ->setHorizontal('center');
+
+        foreach ($sheet->getColumnIterator() as $column) {
+
+            $sheet->getColumnDimension($column->getColumnIndex())
+                  ->setAutoSize(true);
+        }
+
+        for ($i=4; $i <= $currentRowIndex; $i++) {
+
+            $row = $i;
+
+            foreach(range('A', range('A', 'Z')[count($columnTitles)-1]) as $column) {
+
+                $sheet->getStyle($column . $row)
+                  ->getBorders()
+                  ->getOutline()
+                  ->setBorderStyle(Border::BORDER_THIN)
+                  ->setColor(new Color('#000'));
+            }
+        }
+
+        $directoryPath = 'reports/' . self::resource;
+
+        $fileName = Str::uuid() . '.xlsx';
+
+        $filePath = "{$directoryPath}/{$fileName}";
+
+        Storage::disk('public')->put($filePath, '');
+
+        (new Xlsx($spreadsheet))
+            ->save(config('filesystems.disks.public.root') . '/' . $filePath);
+
+        return redirect()->route(self::resource . '.showReportDownloadForm', [
+            'fileName' => $fileName,
+        ]);
+    }
+
+    public function showReportDownloadForm($fileName) {
+
+        $data = (object) [
+            'title' => 'Buat laporan ' . str(self::title)->lower(),
+            'resource' => self::resource,
+        ];
+
+        $filePath
+            = asset('storage/reports/' . self::resource . '/' . $fileName);
+
+
+        $data->url = $filePath;
+
+        return view(self::resource . '.download-report', (array) $data);
+    }
+
 }
 

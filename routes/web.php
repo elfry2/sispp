@@ -116,5 +116,9 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::get('t_siswa/search', [TSiswaController::class, 'search'])->name('t_siswa.search');
         Route::get('t_siswa/preferences', [TSiswaController::class, 'preferences'])->name('t_siswa.preferences');
         Route::post('t_siswa/preferences', [TSiswaController::class, 'applyPreferences'])->name('t_siswa.applyPreferences');
+        Route::get('t_siswa/generate-report', [TSiswaController::class, 'showReportGenerationForm'])->name('t_siswa.showReportGenerationForm');
+        Route::post('t_siswa/generate-report', [TSiswaController::class, 'generateReport'])->name('t_siswa.generateReport');
+        Route::get('t_siswa/reports/{fileName}', [TSiswaController::class, 'showReportDownloadForm'])->name('t_siswa.showReportDownloadForm');
+
     });
 });

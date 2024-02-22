@@ -264,7 +264,7 @@ class TKelasController extends Controller
         $primary = $primary->get();
 
         $rows = [
-            ['Laporan Data Kelas'],
+            ['Laporan Data ' . self::title],
             [],
             [],
         ];
@@ -321,15 +321,16 @@ class TKelasController extends Controller
             }
         }
 
-        $directoryPath = 'app/public/reports/' . self::resource;
+        $directoryPath = 'reports/' . self::resource;
 
         $fileName = Str::uuid() . '.xlsx';
 
-        $filePath = "${directoryPath}/${fileName}";
+        $filePath = "{$directoryPath}/{$fileName}";
 
-        Storage::disk('local')->put($filePath, '');
+        Storage::disk('public')->put($filePath, '');
 
-        (new Xlsx($spreadsheet))->save(storage_path($filePath));
+        (new Xlsx($spreadsheet))
+            ->save(config('filesystems.disks.public.root') . '/' . $filePath);
 
         return redirect()->route(self::resource . '.showReportDownloadForm', [
             'fileName' => $fileName,
@@ -339,7 +340,7 @@ class TKelasController extends Controller
     public function showReportDownloadForm($fileName) {
 
         $data = (object) [
-            'title' => 'Laporan berhasil dibuat',
+            'title' => 'Buat laporan ' . str(self::title)->lower(),
             'resource' => self::resource,
         ];
 

@@ -551,32 +551,48 @@ class TPembayaranController extends Controller
         foreach ($sheet->getColumnIterator() as $column) {
            $sheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
+        //
+        // $writer = new Xlsx($spreadsheet);
+        //
+        // $fileName = Str::uuid() . '.xlsx';
+        //
+        // $directoryPath = "app/public/reports/payments/";
+        //
+        // Storage::put($directoryPath . $fileName, 'aaa');
+        //
+        // $writer->save(storage_path($directoryPath . $fileName));
+        //
+        // return redirect(route(self::resource . '.showReport', [
+        //     'fileName' => $fileName
+        // ]));
 
-        $writer = new Xlsx($spreadsheet);
+        $directoryPath = 'reports/' . self::resource;
 
         $fileName = Str::uuid() . '.xlsx';
 
-        $directoryPath = "app/public/reports/payments/";
+        $filePath = "{$directoryPath}/{$fileName}";
 
-        Storage::put($directoryPath . $fileName, 'aaa');
+        Storage::disk('public')->put($filePath, '');
 
-        $writer->save(storage_path($directoryPath . $fileName));
+        (new Xlsx($spreadsheet))
+            ->save(config('filesystems.disks.public.root') . '/' . $filePath);
 
         return redirect(route(self::resource . '.showReport', [
             'fileName' => $fileName
         ]));
+
     }
 
     public function showReport($fileName) {
 
         $data = (object) [
-            'title' => 'Laporan berhasil dibuat',
+            'title' => 'Buat laporan ' . str(self::title)->lower(),
             'resource' => self::resource,
         ];
 
-        $directoryPath = "reports/payments/";
+        $directoryPath = 'reports/' . self::resource;
 
-        $data->url = asset('storage/' . $directoryPath . $fileName);
+        $data->url = asset('storage/' . $directoryPath . '/' . $fileName);
 
         return view(self::resource . '.show-report', (array) $data);
     }
