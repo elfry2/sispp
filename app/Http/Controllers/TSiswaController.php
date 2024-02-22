@@ -328,7 +328,7 @@ class TSiswaController extends Controller
             $row->alamat,
             $row->tgl_lahir,
             $row->tempat_lahir,
-            $row->jk,
+            $row->jk ? 'Laki-laki' : 'Perempuan',
             $row->kelas->nm_kelas,
         ];
 
