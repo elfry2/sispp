@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
@@ -24,7 +26,6 @@ class TPembayaranController extends Controller
     protected const primaryKeyColumnName = 'id_pembayaran';
 
     protected const queryColumnNames = [
-        'id_pembayaran',
         'nis',
         'nama_siswa',
     ];
@@ -66,6 +67,46 @@ class TPembayaranController extends Controller
         if($classFilterPreference)
             $data->primary->where('kd_kls', $classFilterPreference);
 
+        $yearFilterPreference = preference(self::resource . '.filters.payments.year');
+
+        if($yearFilterPreference) {
+
+            $data->primary->whereHas(
+                'pembayaran',
+                function($query) use ($yearFilterPreference) {
+
+                    return $query->whereHas(
+                        'detail',
+                        function($query) use ($yearFilterPreference) {
+
+                            return $query->where(
+                                'tahun_pembayaran',
+                                $yearFilterPreference
+                            );
+                    });
+            });
+        }
+
+        $monthFilterPreference = preference(self::resource . '.filters.payments.month');
+
+        if($monthFilterPreference) {
+
+            $data->primary->whereHas(
+                'pembayaran',
+                function($query) use ($monthFilterPreference) {
+
+                    return $query->whereHas(
+                        'detail',
+                        function($query) use ($monthFilterPreference) {
+
+                            return $query->where(
+                                'bulan',
+                                $monthFilterPreference
+                            );
+                    });
+            });
+        }
+
         if (!empty(request('q'))) {
 
             foreach (self::queryColumnNames as $index => $columnName) {
@@ -79,8 +120,7 @@ class TPembayaranController extends Controller
             }
         }
 
-        $data->primary = $data->primary
-                              ->paginate(config('app.rowsPerPage'))->withQueryString();
+        $data->primary = $data->primary->get();
 
         $data->primary->map(function($row) {
 
@@ -110,10 +150,42 @@ class TPembayaranController extends Controller
             $monthsSinceFirstPayment += ($current->month - 1);
 
             $row->tunggakan
-                = $monthsSinceFirstPayment - $row->pembayaran->count();
+                = $monthsSinceFirstPayment - $row->pembayaran()->count();
 
             return $row;
         });
+
+        $hasDebtFilter = preference(self::resource . '.filters.hasDebt');
+
+        if($hasDebtFilter) {
+
+            switch($hasDebtFilter) {
+
+            case '1':
+                $data->primary = $data->primary->filter(function ($row) {
+                    return $row->tunggakan > 0;
+                });
+                break;
+
+            case '2':
+                $data->primary = $data->primary->filter(function ($row) {
+                    return $row->tunggakan === 0;
+                });
+                break;
+
+            default:
+                break;
+            }
+        }
+
+        // $data->primary = $data->primary
+        //                       ->paginate(config('app.rowsPerPage'))->withQueryString();
+
+        $data->primary = new LengthAwarePaginator(
+            $data->primary->slice(request('page'), config('app.rowsPerPage')),
+            $data->primary->count(),
+            config('app.rowsPerPage')
+        );
 
         return view(self::resource . '.index', (array) $data);
     }
@@ -596,4 +668,59 @@ class TPembayaranController extends Controller
 
         return view(self::resource . '.show-report', (array) $data);
     }
+
+    /**
+     * Show the form for editing the preferences for the listing of the resource.
+     */
+    public function preferences()
+    {
+        $data = (object) [
+            'resource' => self::resource,
+            'title' => 'Preferensi ' . str(self::title)->lower(),
+            'primary' => Schema::getColumnListing('t_siswa'),
+            'secondary' => t_kelas::all(),
+            'tertiary'
+                => t_dtl_pembayaran::distinct()->pluck('tahun_pembayaran'),
+        ];
+
+        $data->primary = collect($data->primary)->map(function ($element) {
+            return (object) [
+                'value' => $element,
+                'label' => str($element)->headline(),
+            ];
+        });
+
+        return view(self::resource . '.preferences', (array) $data);
+    }
+
+    /**
+     * Update the preferences for the listing of the resource in storage.
+     */
+    public function applyPreferences(Request $request)
+    {
+        $validated = (object) $request->validate([
+            'order_column' => 'required|max:255',
+            'order_direction' => 'required|max:255',
+            'tahun_pembayaran' => 'nullable|integer|min:0',
+            'bulan' => 'nullable|integer|min:0|max:11',
+            'kd_kls' => 'nullable|integer|exists:t_kelas,kd_kls',
+            'punya_tunggakan' => 'nullable|integer|min:0|max:2',
+        ]);
+
+        foreach ([
+            'order.column' => $validated->order_column,
+            'order.direction' => $validated->order_direction,
+            'filters.classId' => $validated->kd_kls,
+            'filters.payments.year' => $validated->tahun_pembayaran,
+            'filters.payments.month' => $validated->bulan,
+            'filters.hasDebt' => $validated->punya_tunggakan,
+        ] as $key => $value) preference([self::resource . '.' . $key => $value]);
+
+        return redirect(route(self::resource . '.index'))
+            ->with('message', (object) [
+                'type' => 'success',
+                'content' => 'Preferensi disunting.'
+            ]);
+    }
+
 }
