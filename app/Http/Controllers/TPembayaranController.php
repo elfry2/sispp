@@ -62,6 +62,9 @@ class TPembayaranController extends Controller
             ),
         ];
 
+        if(preference(self::resource . '.filters.hasDebt') == 1)
+            $data->title .= ' jatuh tempo';
+
         $classFilterPreference = preference(self::resource . '.filters.classId');
 
         if($classFilterPreference)
