@@ -27,25 +27,44 @@
                         <a class="fs-5 text-{{ preference('theme', 'light') == 'light' ? 'dark' : 'light' }} fw-bold" href="{{ route('home.index') }}">{{ config('app.name') }}</a>
                         <div class="btn invisible"><i class="bi-moon"></i></div>
                     </div>
-                    <div class="mt-3">
+                    
+                    <div class="mt-4">
+                        <div class="d-flex align-items-center">
+                            <img src="https://source.boringavatars.com/beam" height="48px" alt="Avatar">
+                            <div class="flex-grow-1 ms-2">
+                                <a href="{{ route('profile.edit') }}" class="fw-bold text-{{ preference('theme', 'light') == 'light' ? 'dark' : 'light' }}">{{ Auth::user()->name }}</a>
+                                <small class="d-block text-success" style="margin-top: -0.25em">Online</small>
+                            </div>
+                            
+                            <form action="{{ route('logout') }}" method="post">
+                                @csrf
+                                <button type="submit"
+                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 rounded"><i
+                                        class="bi-box-arrow-left"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="mt-4">
                         <b>Aplikasi</b>
                         <div class="list-group">
                             <a href="{{ route('summary.index') }}"
-                                class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('summary.*')) fw-bold rounded @endif"><i
+                                class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('summary.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
                                 class="bi-card-text"></i><span class="ms-2">Ikhtisar</span></a>
                             <a href="{{ route('t_pembayaran.index') }}"
-                                class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_pembayaran.*')) fw-bold rounded @endif"><i
+                                class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_pembayaran.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
                                 class="bi-cash-coin"></i><span class="ms-2">Pembayaran</span></a>
                             @if (Auth::user()->level->id == 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('t_siswa.index') }}"
-                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_siswa.*')) fw-bold rounded @endif"><i
+                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_siswa.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
                                     class="bi-backpack"></i><span class="ms-2">Siswa</span></a>
                                 <a href="{{ route('t_kelas.index') }}"
-                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) fw-bold rounded @endif"><i
+                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
                                         class="bi-building"></i><span class="ms-2">Kelas</span></a>
                                 <a href="{{ route('users.index') }}"
-                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('users.*')) fw-bold rounded @endif"><i
+                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('users.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
                                     class="bi-people"></i><span class="ms-2">Pengguna</span></a>
                             @endif
                             <form action="{{ route('preference.store') }}" method="post">
@@ -60,22 +79,6 @@
                             </form>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <b>{{ Auth::user()->name }}</b>
-                        <div class="list-group">
-                            <a href="{{ route('profile.edit') }}"
-                                class="bg-body-tertiary list-group-item list-group-item-action border-0 rounded"><i
-                                    class="bi-person"></i><span class="ms-2">Profil</span>
-                            </a>
-                            <form action="{{ route('logout') }}" method="post">
-                                @csrf
-                                <button type="submit"
-                                    class="bg-body-tertiary list-group-item list-group-item-action border-0 rounded"><i
-                                        class="bi-box-arrow-left"></i><span class="ms-2">Keluar</span></button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- END sidenav -->
 

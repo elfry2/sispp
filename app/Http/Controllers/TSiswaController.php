@@ -210,6 +210,13 @@ class TSiswaController extends Controller
         $primary = (new $primary)
             ->where(self::primaryKeyColumnName, $id);
 
+        $payments = $primary->first()->pembayaran()->get();
+
+        foreach ($payments as $payment) {
+            $payment->detail()->delete();
+            $payment->delete();
+        }
+
         $primary->delete();
 
         return redirect(route(self::resource . '.index'))

@@ -187,5 +187,4 @@ return [
 
     'rowsPerPage' => 20,
 
-
 ];

@@ -34,6 +34,10 @@ a {
     transform: translate(-50%);
 }
 
+.my-bg-primary {
+    background-color: #21cc4e !important;
+}
+
 @media only screen and (max-width: 600px) {
     .hide-on-small-screens {
         display: none !important;
