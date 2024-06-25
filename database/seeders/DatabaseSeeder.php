@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             TaskSeeder::class,
 
             TKelasSeeder::class,
+            TSiswaSeeder::class,
         ];
 
         foreach($seeders as $seeder) {
