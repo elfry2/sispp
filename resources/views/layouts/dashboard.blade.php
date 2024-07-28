@@ -51,21 +51,21 @@
                         <div class="list-group">
                             <a href="{{ route('summary.index') }}"
                                 class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('summary.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
-                                class="bi-card-text"></i><span class="ms-2">Ikhtisar</span></a>
+                                class="bi-card-text"></i><span class="ms-2 small">Ikhtisar</span></a>
                             <a href="{{ route('t_pembayaran.index') }}"
                                 class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_pembayaran.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
-                                class="bi-cash-coin"></i><span class="ms-2">Pembayaran</span></a>
+                                class="bi-cash-coin"></i><span class="ms-2 small">Laporan pembayaran</span></a>
                             @if (Auth::user()->level->id <= 2)
                                 {{-- Administrator level id --}}
                                 <a href="{{ route('t_siswa.index') }}"
                                     class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_siswa.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
-                                    class="bi-backpack"></i><span class="ms-2">Siswa</span></a>
+                                    class="bi-backpack"></i><span class="ms-2 small">Laporan siswa</span></a>
                                 <a href="{{ route('t_kelas.index') }}"
                                     class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('t_kelas.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
-                                        class="bi-building"></i><span class="ms-2">Kelas</span></a>
+                                        class="bi-building"></i><span class="ms-2 small">Laporan kelas</span></a>
                                 <a href="{{ route('users.index') }}"
                                     class="bg-body-tertiary list-group-item list-group-item-action border-0 @if (Route::is('users.*')) fw-bold rounded my-bg-primary text-white shadow @endif"><i
-                                    class="bi-people"></i><span class="ms-2">Pengguna</span></a>
+                                    class="bi-people"></i><span class="ms-2 small">Laporan pengguna</span></a>
                             @endif
                             <form action="{{ route('preference.store') }}" method="post">
                                 @csrf
@@ -75,7 +75,7 @@
                                     value="{{ preference('theme', 'light') == 'light' ? 'dark' : 'light' }}"
                                     class="bg-body-tertiary list-group-item list-group-item-action border-0 rounded"><i
                                         class="bi-{{ preference('theme', 'light') == 'light' ? 'moon' : 'sun' }}"></i><span
-                                        class="ms-2">{{ preference('theme', 'light') == 'light' ? 'Tema gelap' : 'Tema terang' }}</span></button>
+                                        class="ms-2 small">{{ preference('theme', 'light') == 'light' ? 'Tema gelap' : 'Tema terang' }}</span></button>
                             </form>
                         </div>
                     </div>
