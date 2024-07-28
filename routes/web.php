@@ -67,18 +67,20 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
     Route::get('tasks/{task}/edit', [TaskController::class, 'index'])->name('tasks.edit');
 
     Route::get('t_pembayaran/', [TPembayaranController::class, 'index'])->name('t_pembayaran.index');
-    Route::get('t_pembayaran/create', [TPembayaranController::class, 'create'])->name('t_pembayaran.create');
-    Route::post('t_pembayaran/store', [TPembayaranController::class, 'store'])->name('t_pembayaran.store');
-    Route::get('t_pembayaran/{id}/edit', [TPembayaranController::class, 'edit'])->name('t_pembayaran.edit');
-    Route::patch('t_pembayaran/{id}/update', [TPembayaranController::class, 'update'])->name('t_pembayaran.update');
-    Route::get('t_pembayaran/{id}/delete', [TPembayaranController::class, 'delete'])->name('t_pembayaran.delete');
-    Route::delete('t_pembayaran/{id}/destroy', [TPembayaranController::class, 'destroy'])->name('t_pembayaran.destroy');
     Route::get('t_pembayaran/search', [TPembayaranController::class, 'search'])->name('t_pembayaran.search');
     Route::get('t_pembayaran/preferences', [TPembayaranController::class, 'preferences'])->name('t_pembayaran.preferences');
     Route::post('t_pembayaran/preferences', [TPembayaranController::class, 'applyPreferences'])->name('t_pembayaran.applyPreferences');
     Route::get('t_pembayaran/generate-report', [TPembayaranController::class, 'generateReport'])->name('t_pembayaran.generateReport');
     Route::post('t_pembayaran/generate-report', [TPembayaranController::class, 'generateReport'])->name('t_pembayaran.generateReport');
     Route::get('t_pembayaran/reports/{fileName}', [TPembayaranController::class, 'showReport'])->name('t_pembayaran.showReport');
+    Route::middleware('nokepsek')->group(function() {
+        Route::get('t_pembayaran/create', [TPembayaranController::class, 'create'])->name('t_pembayaran.create');
+        Route::post('t_pembayaran/store', [TPembayaranController::class, 'store'])->name('t_pembayaran.store');
+        Route::get('t_pembayaran/{id}/edit', [TPembayaranController::class, 'edit'])->name('t_pembayaran.edit');
+        Route::patch('t_pembayaran/{id}/update', [TPembayaranController::class, 'update'])->name('t_pembayaran.update');
+        Route::get('t_pembayaran/{id}/delete', [TPembayaranController::class, 'delete'])->name('t_pembayaran.delete');
+        Route::delete('t_pembayaran/{id}/destroy', [TPembayaranController::class, 'destroy'])->name('t_pembayaran.destroy');
+    });
 
     Route::get('summary', [SummaryController::class, 'index'])->name('summary.index');
 
@@ -90,35 +92,43 @@ Route::middleware(['auth', 'notSuspended'])->group(function () {
         Route::get('users/search', [RegisteredUserController::class, 'search'])->name('users.search');
         Route::get('users/preferences', [RegisteredUserController::class, 'preferences'])->name('users.preferences');
         Route::post('users/preferences', [RegisteredUserController::class, 'applyPreferences'])->name('users.applyPreferences');
-        Route::resource('users', RegisteredUserController::class)->except('show');
+        Route::resource('users', RegisteredUserController::class)
+            ->except('show', 'index')
+            ->middleware('nokepsek');
+        Route::get('/users', [RegisteredUserController::class, 'index'])
+            ->name('users.index');
 
         Route::get('t_kelas/', [TKelasController::class, 'index'])->name('t_kelas.index');
-        Route::get('t_kelas/create', [TKelasController::class, 'create'])->name('t_kelas.create');
-        Route::post('t_kelas/store', [TKelasController::class, 'store'])->name('t_kelas.store');
-        Route::get('t_kelas/{id}/edit', [TKelasController::class, 'edit'])->name('t_kelas.edit');
-        Route::patch('t_kelas/{id}/update', [TKelasController::class, 'update'])->name('t_kelas.update');
-        Route::get('t_kelas/{id}/delete', [TKelasController::class, 'delete'])->name('t_kelas.delete');
-        Route::delete('t_kelas/{id}/destroy', [TKelasController::class, 'destroy'])->name('t_kelas.destroy');
         Route::get('t_kelas/search', [TKelasController::class, 'search'])->name('t_kelas.search');
         Route::get('t_kelas/preferences', [TKelasController::class, 'preferences'])->name('t_kelas.preferences');
         Route::post('t_kelas/preferences', [TKelasController::class, 'applyPreferences'])->name('t_kelas.applyPreferences');
         Route::get('t_kelas/generate-report', [TKelasController::class, 'showReportGenerationForm'])->name('t_kelas.showReportGenerationForm');
         Route::post('t_kelas/generate-report', [TKelasController::class, 'generateReport'])->name('t_kelas.generateReport');
         Route::get('t_kelas/reports/{fileName}', [TKelasController::class, 'showReportDownloadForm'])->name('t_kelas.showReportDownloadForm');
+        Route::middleware('nokepsek')->group(function() {
+            Route::get('t_kelas/create', [TKelasController::class, 'create'])->name('t_kelas.create');
+            Route::post('t_kelas/store', [TKelasController::class, 'store'])->name('t_kelas.store');
+            Route::get('t_kelas/{id}/edit', [TKelasController::class, 'edit'])->name('t_kelas.edit');
+            Route::patch('t_kelas/{id}/update', [TKelasController::class, 'update'])->name('t_kelas.update');
+            Route::get('t_kelas/{id}/delete', [TKelasController::class, 'delete'])->name('t_kelas.delete');
+            Route::delete('t_kelas/{id}/destroy', [TKelasController::class, 'destroy'])->name('t_kelas.destroy');
+        });
 
         Route::get('t_siswa/', [TSiswaController::class, 'index'])->name('t_siswa.index');
-        Route::get('t_siswa/create', [TSiswaController::class, 'create'])->name('t_siswa.create');
-        Route::post('t_siswa/store', [TSiswaController::class, 'store'])->name('t_siswa.store');
-        Route::get('t_siswa/{id}/edit', [TSiswaController::class, 'edit'])->name('t_siswa.edit');
-        Route::patch('t_siswa/{id}/update', [TSiswaController::class, 'update'])->name('t_siswa.update');
-        Route::get('t_siswa/{id}/delete', [TSiswaController::class, 'delete'])->name('t_siswa.delete');
-        Route::delete('t_siswa/{id}/destroy', [TSiswaController::class, 'destroy'])->name('t_siswa.destroy');
         Route::get('t_siswa/search', [TSiswaController::class, 'search'])->name('t_siswa.search');
         Route::get('t_siswa/preferences', [TSiswaController::class, 'preferences'])->name('t_siswa.preferences');
         Route::post('t_siswa/preferences', [TSiswaController::class, 'applyPreferences'])->name('t_siswa.applyPreferences');
         Route::get('t_siswa/generate-report', [TSiswaController::class, 'showReportGenerationForm'])->name('t_siswa.showReportGenerationForm');
         Route::post('t_siswa/generate-report', [TSiswaController::class, 'generateReport'])->name('t_siswa.generateReport');
         Route::get('t_siswa/reports/{fileName}', [TSiswaController::class, 'showReportDownloadForm'])->name('t_siswa.showReportDownloadForm');
+        Route::middleware('nokepsek')->group(function() {
+            Route::get('t_siswa/create', [TSiswaController::class, 'create'])->name('t_siswa.create');
+            Route::post('t_siswa/store', [TSiswaController::class, 'store'])->name('t_siswa.store');
+            Route::get('t_siswa/{id}/edit', [TSiswaController::class, 'edit'])->name('t_siswa.edit');
+            Route::patch('t_siswa/{id}/update', [TSiswaController::class, 'update'])->name('t_siswa.update');
+            Route::get('t_siswa/{id}/delete', [TSiswaController::class, 'delete'])->name('t_siswa.delete');
+            Route::delete('t_siswa/{id}/destroy', [TSiswaController::class, 'destroy'])->name('t_siswa.destroy');
+        });
 
     });
 });

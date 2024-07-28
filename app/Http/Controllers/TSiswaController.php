@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf;
 use App\Models\Folder;
 use App\Models\t_siswa;
 use App\Models\t_kelas;
@@ -377,18 +378,23 @@ class TSiswaController extends Controller
 
         $directoryPath = 'reports/' . self::resource;
 
-        $fileName = Str::uuid() . '.xlsx';
+        $fileName = Str::uuid();
 
         $filePath = "{$directoryPath}/{$fileName}";
 
-        Storage::disk('public')->put($filePath, '');
+        Storage::disk('public')->put($filePath . '.xlsx', '');
 
         (new Xlsx($spreadsheet))
-            ->save(config('filesystems.disks.public.root') . '/' . $filePath);
+            ->save(config('filesystems.disks.public.root') . '/' . $filePath . '.xlsx');
 
-        return redirect()->route(self::resource . '.showReportDownloadForm', [
-            'fileName' => $fileName,
-        ]);
+        Storage::disk('public')->put($filePath . '.pdf', '');
+
+        (new Mpdf($spreadsheet))
+            ->save(config('filesystems.disks.public.root') . '/' . $filePath . '.pdf');
+
+        return redirect(route(self::resource . '.showReportDownloadForm', [
+            'fileName' => $fileName
+        ]));
     }
 
     public function showReportDownloadForm($fileName) {

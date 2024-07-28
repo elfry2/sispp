@@ -28,6 +28,13 @@ class UserSeeder extends Seeder
                 'password' => 'bendahara@localhost',
                 'level_id' => 3
             ],
+            [
+                'name' => 'Kepala Sekolah',
+                'username' => 'kepalasekolah',
+                'email' => 'kepalasekolah@localhost',
+                'password' => 'kepalasekolah@localhost',
+                'level_id' => 1
+            ],
         ];
 
         foreach($users as $user) {

@@ -2,13 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Level;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class ForbidIfLevelNotAdministrator
+class ForbidIfLevelIsKepalaSekolah
 {
     /**
      * Handle an incoming request.
@@ -17,9 +16,13 @@ class ForbidIfLevelNotAdministrator
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $adminLevelId = Level::where('name', 'Administrator')->first()->id;
-
-        if(Auth::user()->level->id > $adminLevelId) abort(403);
+        if (Auth::user()->level->name == "Kepala Sekolah")
+            return redirect()
+                ->back()
+                ->with('message', (object) [
+                    'type' => 'danger',
+                    'content' => 'Akses tidak diizinkan.'
+                ]);
 
         return $next($request);
     }

@@ -28,9 +28,11 @@
             });
 
             filteredStudents.forEach(function(student) {
+                console.log(student);
+
                 studentSuggestions.innerHTML += `<a href="#"
                     class="mt-2 btn border-0 btn-outline-{{ preference('theme') === 'dark' ? 'light' : 'dark' }} d-block text-start"
-                    onclick="nisTextInput.value = ${String(student.nis)}; studentSuggestions.innerHTML = ''; tahunPembayaranNumberInput.focus()"
+                    onclick="nisTextInput.value = '${student.nis}'; studentSuggestions.innerHTML = ''; tahunPembayaranNumberInput.focus()"
                 >${student.nis} - ${student.nama_siswa}</a>`;
             })
         })
